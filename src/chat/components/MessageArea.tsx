@@ -83,7 +83,7 @@ export default function MessageArea(props: MessageAreaProps) {
       />
       <div className="bg-white/10 absolute inset-0 backdrop-blur-sm z-0 pointer-events-none" />
 
-      <div className="relative z-10 flex-1 flex flex-col justify-between min-h-0">
+      <div className="md:mt-14 lg:mt-14  relative z-10 flex-1 flex flex-col justify-between min-h-0">
         <div className="flex-1 overflow-y-auto px-2 md:px-4 pt-4 space-y-4 scroll-smooth">
           {allMessages.map((msg) => (
             <div
@@ -107,7 +107,7 @@ export default function MessageArea(props: MessageAreaProps) {
                     : "bg-[var(--c-chat-bubble)]/90 backdrop-blur-sm"
                 }`}
               >
-                <div className="prose prose-sm max-w-full p-2 text-[var(--c-text)]/80">
+                <div className=" prose prose-sm max-w-full p-2 text-[var(--c-text)]/80">
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                 </div>
               </div>
