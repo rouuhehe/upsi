@@ -16,7 +16,6 @@ export const GuidePage = () => {
 
   return (
     <div className="flex md:flex-row min-h-screen relative bg-[var(--c-bg)]">
-      {/* Fondo difuminado cuando la sidebar está abierta en móvil */}
       {isSidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -35,8 +34,8 @@ export const GuidePage = () => {
 
       <aside
         className={`
-          fixed top-0 left-0 h-full w-64 z-40 transform transition-transform duration-300
-          bg-[var(--c-bg)] md:static md:translate-x-0
+          fixed md:sticky h-screen top-0 left-0 z-40 transform transition-transform duration-300
+          bg-[var(--c-bg)] md:translate-x-0 shadow-lg
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >

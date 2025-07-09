@@ -29,8 +29,8 @@ export const GuideSidebar = ({
     currentUser?.roles?.includes("ADMIN");
 
   return (
-    <aside className=" w-[280px] min-h-screen backdrop-blur-xl  shadow-xl">
-      <div className="ml-4 mr-12  mt-16">
+    <aside className=" w-[280px] min-h-screen backdrop-blur-xl shadow-xl">
+      <div className="ml-5 mr-5  mt-16">
         <div className="mb-8">
           <h1 className="text-xl font-bold text-[var(--c-text)]">
             Guías Legales
