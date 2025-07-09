@@ -40,11 +40,9 @@ export default function LawyerProfilePage() {
   if (!lawyerId) return <p>Abogado no encontrado.</p>;
   return (
     <div className="flex flex-col md:flex-row min-h-screen text-[var(--c-text)]">
-      {/* Sidebar */}
       <LawyerSidebar lawyer={lawyer} summary={summary} error={lawyerError} />
 
-      <main className="flex-1 p-6 space-y-6">
-        {/* Descripción */}(
+      <main className="mt-12 flex-1 p-6 space-y-6">
         <section>
           <h2 className="text-xl font-bold mb-4">Sobre el abogado</h2>
           <p className="text-[var(--c-text)]/90 leading-relaxed">
