@@ -5,7 +5,6 @@ import { LawyerRatingSummarySchema } from "../schemas/LawyerRatingSummarySchema"
 import { Mail, MapPin } from "lucide-react";
 import { hasCooldown } from "../../utils/contactCooldown";
 import { useState } from "react";
-import { sendLawyerReview } from "../services/review-lawyer";
 
 type LawyerRatingSummary = z.infer<typeof LawyerRatingSummarySchema>;
 
@@ -32,21 +31,7 @@ export function LawyerSidebar({
     if (rating === 0 || reviewText.trim() === "") return;
     if (!lawyer?.userId) return;
 
-    const result = await sendLawyerReview({
-      lawyerId: lawyer.id,
-      rating,
-      content: reviewText.trim(),
-    });
 
-    if (result.isOk()) {
-      alert("Reseña enviada con éxito");
-      setShowReviewForm(false);
-      setRating(0);
-      setReviewText("");
-    } else {
-      console.error(result.error);
-      alert("No se pudo enviar la reseña");
-    }
   };
 
   return (
