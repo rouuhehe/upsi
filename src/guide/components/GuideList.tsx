@@ -4,17 +4,24 @@ import { useFilteredGuides } from "../hooks/useFilteredGuides";
 import type { GuideType } from "../types/GuideType";
 import { GuideTypeLabels } from "../constants/guideLabels";
 import { useCurrentUser } from "../../user/hooks/useCurrentUser";
+import type { Dispatch, SetStateAction } from "react";
 
 interface GuideListProps {
   filterType: GuideType | "";
+  setFilterType: (type: GuideType | "") => void;
   filterAge: "latest" | "oldest" | "";
+  setFilterAge: Dispatch<SetStateAction<"latest" | "oldest" | "">>;
   searchTerm: string;
+  setSearchTerm: (term: string) => void;
 }
 
 export const GuideList = ({
   filterType,
+  setFilterType,
   filterAge,
+  setFilterAge,
   searchTerm,
+  setSearchTerm,
 }: GuideListProps) => {
   const navigate = useNavigate();
   const { user: currentUser } = useCurrentUser();
@@ -120,7 +127,11 @@ export const GuideList = ({
                 </div>
 
                 <button
-                  onClick={() => navigate("/guides")}
+                  onClick={() => {
+                    setFilterType("");
+                    setFilterAge("");
+                    setSearchTerm("");
+                  }}
                   className="ml-auto group flex items-center space-x-2 px-4 py-2 bg-[var(--c-text-soft)]/45 hover:bg-white/30 text-white rounded-full text-sm font-medium transition-all duration-300 hover:scale-105"
                 >
                   <svg

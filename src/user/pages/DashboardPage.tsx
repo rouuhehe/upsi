@@ -3,11 +3,11 @@ import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ConfirmModal from "../../common/components/ConfirmModal";
-import { deleteCurrentUser } from "../services/deleteCurrentUser";
 import { useAuthContext } from "../../auth/hooks/useAuthContext";
 import { useMyLawyerProfile } from "../../lawyer/hooks/useMyLawyerProfile";
 import { useToggleLawyerVisibility } from "../../lawyer/hooks/useToggleLawyerVisibility";
 import { Toggle } from "../../lawyer/components/Toggle";
+import { apiClient } from "../../utils/api";
 
 const rolePriority = ["ADMIN", "LAWYER", "USER"] as const;
 
@@ -124,7 +124,7 @@ export default function DashboardPage() {
             message="tu cuenta permanentemente"
             onCancel={() => setShowConfirm(false)}
             onConfirm={async () => {
-              await deleteCurrentUser();
+              await apiClient.deleteCurrentUser();
               logout();
             }}
           />

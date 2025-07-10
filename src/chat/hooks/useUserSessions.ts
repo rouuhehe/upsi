@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import type { SessionResponseArray } from "../types/SessionResponse";
-import { listUserSessions } from "../services/listUserSessions";
+import { apiClient, wrap } from "../../utils/api";
 
 export function useUserSessions() {
   const query = useQuery<SessionResponseArray, Error>({
     queryKey: ["userSessions"],
     queryFn: async () => {
-      return (await listUserSessions())
+      return (await wrap<SessionResponseArray>(apiClient.listUserSessions()))
         .map((sessions) =>
           sessions.sort(
             (a, b) =>

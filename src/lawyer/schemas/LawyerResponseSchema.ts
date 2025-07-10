@@ -18,3 +18,4 @@ export const LawyerResponseSchema = z.object({
 
 export type LawyerResponse = z.infer<typeof LawyerResponseSchema>;
 export const LawyerResponseArraySchema = z.array(LawyerResponseSchema);
+export type LawyerResponseArray = z.infer<typeof LawyerResponseArraySchema>;

@@ -1,8 +1,7 @@
 import type { LawyerResponse } from "../schemas/LawyerResponseSchema";
 import { useEffect, useState } from "react";
-import { sendLawyerContact } from "../services/contact-lawyer";
 import { useNavigate } from "react-router-dom";
-import { apiClient } from "../../utils/api"; // <-- Asegúrate de importar esto
+import { apiClient, wrap } from "../../utils/api";
 import { LawyerSpecializationLabels } from "../schemas/lawyerLabels";
 
 export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
@@ -20,9 +19,11 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
   useEffect(() => {
     const checkBlocked = async () => {
       try {
-        const contacted = await apiClient.hasContactedLawyer({
-          params: { lawyerId: lawyer.id },
-        });
+        const contacted = (
+          await wrap<boolean>(
+            apiClient.hasContactedLawyer({ params: { lawyerId: lawyer.id } }),
+          )
+        )._unsafeUnwrap();
         setIsBlocked(contacted);
       } catch (err) {
         console.error("Error verificando contacto:", err);
@@ -35,11 +36,12 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
   const handleSend = async () => {
     setIsSending(true);
 
-    const result = await sendLawyerContact({
-      lawyerId: lawyer.id,
-      subject,
-      message,
-    });
+    const result = await wrap(
+      apiClient.sendLawyerContact({
+        body: { subject, message },
+        params: { lawyerId: lawyer.id },
+      }),
+    );
 
     if (result.isOk()) {
       alert("Correo enviado con éxito");

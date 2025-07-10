@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "../../utils/api";
+import { apiClient, wrap } from "../../utils/api";
 import type { GuideType } from "../types/GuideType";
 import { useMemo } from "react";
+import type { GuideList } from "../types/Guide";
 
 interface UseFilteredGuidesOptions {
   typeFilter: GuideType | "";
@@ -16,7 +17,8 @@ export function useFilteredGuides({
 }: UseFilteredGuidesOptions) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["guides"],
-    queryFn: () => apiClient.listGuides(),
+    queryFn: async () =>
+      (await wrap<GuideList>(apiClient.listGuides()))._unsafeUnwrap(),
   });
 
   const filteredGuides = useMemo(() => {

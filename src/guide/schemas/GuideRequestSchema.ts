@@ -17,5 +17,3 @@ export const GuideRequestSchema = z.object({
       message: "El contenido no puede ser solo números",
     }),
 });
-
-export type GuideRequest = z.infer<typeof GuideRequestSchema>;

@@ -3,8 +3,8 @@ import { useUserSessions } from "../hooks/useUserSessions";
 import { useState } from "react";
 import clsx from "clsx";
 import type { SessionResponse } from "../types/SessionResponse";
-import { deleteSessionById } from "../services/deleteSessionById";
 import ConfirmModal from "../../common/components/ConfirmModal";
+import { apiClient, wrap } from "../../utils/api";
 
 interface SessionSidebarProps {
   sessionId: string | null;
@@ -93,7 +93,11 @@ export default function SessionSidebar(props: SessionSidebarProps) {
           <ConfirmModal
             message={`"${sessionToDelete.title?.trim() || "Sin título"}"`}
             onConfirm={async () => {
-              await deleteSessionById(sessionToDelete.id);
+              await wrap(
+                apiClient.deleteSessionById({
+                  params: { id: sessionToDelete.id },
+                }),
+              );
               if (sessionToDelete.id === props.sessionId)
                 props.setSessionId(null);
               setSessionToDelete(null);

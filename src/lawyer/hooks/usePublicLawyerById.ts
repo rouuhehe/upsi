@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { apiClient } from "../../utils/api";
-import { ResultAsync } from "neverthrow";
+import { err, ok, ResultAsync } from "neverthrow";
 import { z } from "zod";
 import { LawyerResponseSchema } from "../schemas/LawyerResponseSchema";
 
@@ -25,7 +25,13 @@ export function usePublicLawyerById(id: string) {
             "No se pudo cargar la información del abogado.";
           return msg;
         },
-      ),
+      ).andThen((res) => {
+        if (res.status === 200) {
+          return ok(res.body);
+        }
+
+        return err(res.body.message);
+      }),
     [id],
   );
 

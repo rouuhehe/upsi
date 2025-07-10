@@ -2,8 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import type { AuthResponse } from "../types/AuthResponse";
-import { verifyUser } from "../services/verifyUser";
-import { resendVerification } from "../services/resendVerification";
 import {
   AlertTriangle,
   CheckCircle,
@@ -11,6 +9,7 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react";
+import { apiClient, wrap } from "../../utils/api";
 
 const tokenSchema = z.string().min(10, "token inválido");
 
@@ -24,7 +23,11 @@ export default function VerificationPage() {
     queryFn: async () => {
       if (!rawToken) throw new Error("Missing token");
 
-      return (await verifyUser(rawToken))._unsafeUnwrap();
+      return (
+        await wrap<AuthResponse>(
+          apiClient.verifyUser({ query: { token: rawToken } }),
+        )
+      )._unsafeUnwrap();
     },
     enabled: tokenResult.success,
     retry: false,
@@ -34,7 +37,11 @@ export default function VerificationPage() {
     mutationFn: async () => {
       if (!rawToken) throw new Error("Missing token");
 
-      return (await resendVerification(rawToken))._unsafeUnwrap();
+      return (
+        await wrap<void>(
+          apiClient.resendVerification({ query: { token: rawToken } }),
+        )
+      )._unsafeUnwrap();
     },
 
     onSuccess: () => navigate("/auth/login"),

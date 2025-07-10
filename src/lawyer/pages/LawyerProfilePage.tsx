@@ -6,7 +6,8 @@ import { Star } from "lucide-react";
 import { LawyerSidebar } from "../components/LawyerProfileSidebar";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "../../user/hooks/useCurrentUser";
-import { editLawyerDescription } from "../services/edit-lawyer-description";
+import { apiClient, wrap } from "../../utils/api";
+import type { LawyerResponse } from "../schemas/LawyerResponseSchema";
 
 export default function LawyerProfilePage() {
   const { lawyerId } = useParams<{ lawyerId: string }>();
@@ -58,7 +59,11 @@ export default function LawyerProfilePage() {
                   <button
                     onClick={async () => {
                       {
-                        await editLawyerDescription(localDescription);
+                        await wrap<LawyerResponse>(
+                          apiClient.editCurrentUserLawyerDescription({
+                            query: { newDescription: localDescription },
+                          }),
+                        );
                         reloadLawyer();
                         setEditingDescription(false);
                       }

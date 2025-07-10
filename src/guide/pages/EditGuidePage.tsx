@@ -25,10 +25,10 @@ export default function EditGuidePage() {
     }
   }, [guide]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-    await update({ id, title, type, content });
+    update({ id, title, type, content });
   };
 
   if (isLoading) {

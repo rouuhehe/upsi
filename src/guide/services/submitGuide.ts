@@ -1,6 +1,7 @@
 import { GuideRequestSchema } from "../schemas/GuideRequestSchema";
-import { apiClient } from "../../utils/api";
-import { ResultAsync, err, ok } from "neverthrow";
+import { apiClient, wrap } from "../../utils/api";
+import { err, ok } from "neverthrow";
+import type { Guide } from "../types/Guide";
 
 function validateGuideInput(data: unknown) {
   const parsed = GuideRequestSchema.safeParse(data);
@@ -10,9 +11,6 @@ function validateGuideInput(data: unknown) {
 
 export async function submitGuide(data: unknown) {
   return validateGuideInput(data).asyncAndThen((validatedData) =>
-    ResultAsync.fromPromise(
-      apiClient.createGuide(validatedData),
-      (error) => new Error(`Error al crear guía: ${error}`),
-    ),
+    wrap<Guide>(apiClient.createGuide({ body: validatedData })),
   );
 }

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { apiClient } from "../../utils/api";
 import type { GuideType } from "../schemas/GuideTypeSchema";
-import type { AxiosError } from "axios";
 
 interface UpdateGuideData {
   id: string;
@@ -26,23 +25,21 @@ export function useUpdateGuide() {
 
   const { mutate: update, isPending: isSubmitting } = useMutation({
     mutationFn: (data: UpdateGuideData) =>
-      apiClient.updateGuide(
-        {
+      apiClient.updateGuide({
+        body: {
           title: data.title,
           type: data.type,
           content: data.content,
         },
-        {
-          params: { id: data.id },
-        }
-      ),
+        params: { id: data.id },
+      }),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["guide", id] });
       navigate(`/guides/${id}`);
     },
-    onError: (error: AxiosError<ValidationErrorResponse>) => {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
+    onError: (error: ValidationErrorResponse) => {
+      if (error.errors) {
+        setErrors(error.errors);
       } else {
         console.error("Error al actualizar guía", error);
       }

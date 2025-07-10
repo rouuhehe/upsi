@@ -1,4 +1,4 @@
-import { createSession } from "./createSession";
+import { apiClient, wrap } from "../../utils/api";
 import type { SessionResponse } from "../types/SessionResponse";
 import { ResultAsync } from "neverthrow";
 
@@ -13,8 +13,10 @@ export function createSessionIfNeeded(
     );
   }
 
-  return createSession().map((session: SessionResponse) => {
-    setSessionId(session.id);
-    return session.id;
-  });
+  return wrap<SessionResponse>(apiClient.createSession()).map(
+    (session: SessionResponse) => {
+      setSessionId(session.id);
+      return session.id;
+    },
+  );
 }

@@ -3,6 +3,7 @@ import { ProvinceSchema } from "./ProvinceSchema";
 import { LawyerSpecializationsSetSchema } from "./LawyerSpecializationSchema";
 
 export const LawyerRegisterSchema = z.object({
+  email: z.string().email("Email inválido"),
   tuitionNumber: z
     .string()
     .trim()

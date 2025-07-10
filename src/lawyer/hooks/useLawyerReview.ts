@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { apiClient } from "../../utils/api";
-import { ResultAsync } from "neverthrow";
+import { err, ok, ResultAsync } from "neverthrow";
 import { sendLawyerReview } from "../services/review-lawyer";
 
 type ReviewSummary = {
@@ -26,7 +26,13 @@ export function useLawyerReview(lawyerId: string) {
           "No se pudo cargar el resumen.";
         return msg;
       },
-    );
+    ).andThen((res) => {
+      if (res.status === 200) {
+        return ok(res.body);
+      }
+
+      return err(res.body.message);
+    });
 
     result
       .map((res) => {

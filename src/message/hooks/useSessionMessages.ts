@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { MessageResponseArray } from "../types/MessageResponse";
-import { listSessionMessages } from "../services/listSessionMessages";
+import { apiClient, wrap } from "../../utils/api";
 
 export function useSessionMessages(id: string | null) {
   const query = useQuery<MessageResponseArray, Error>({
@@ -8,7 +8,11 @@ export function useSessionMessages(id: string | null) {
     queryFn: async () => {
       if (!id) return [];
 
-      return (await listSessionMessages(id))._unsafeUnwrap();
+      return (
+        await wrap<MessageResponseArray>(
+          apiClient.listSessionMessages({ params: { id } }),
+        )
+      )._unsafeUnwrap();
     },
     enabled: !!id,
   });

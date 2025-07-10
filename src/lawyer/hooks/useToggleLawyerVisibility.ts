@@ -1,14 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../../utils/api";
+import { apiClient, wrap } from "../../utils/api";
 
 export const useToggleLawyerVisibility = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (isPublic: boolean) =>
-      apiClient.patch("/api/lawyers/me/visibility", undefined, {
-        queries: { isPublic },
-      }),
+    mutationFn: async (isPublic: boolean) =>
+      (
+        await wrap<void>(
+          apiClient.toggleLawyerVisibility({ query: { isPublic } }),
+        )
+      )._unsafeUnwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-lawyer-profile"] });
     },

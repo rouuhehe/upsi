@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { ResultAsync } from "neverthrow";
+import { err, ok, ResultAsync } from "neverthrow";
 import { apiClient } from "../../utils/api";
 import { z } from "zod";
 import { LawyerReviewSchema } from "../schemas/LawyerReviewSchema";
@@ -25,7 +25,13 @@ export function useLawyerReviewList(lawyerId: string) {
             "No se pudieron cargar las reseñas.";
           return msg;
         },
-      ),
+      ).andThen((res) => {
+        if (res.status === 200) {
+          return ok(res.body);
+        }
+
+        return err(res.body.message);
+      }),
     [lawyerId],
   );
 

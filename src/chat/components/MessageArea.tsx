@@ -3,12 +3,12 @@ import { useSessionMessages } from "../../message/hooks/useSessionMessages";
 import clsx from "clsx";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useUserSessions } from "../hooks/useUserSessions";
-import { sendPromptBySessionId } from "../services/sendPromptBySessionId";
 import { createSessionIfNeeded } from "../services/createSessionIfNeeded";
 import type {
   MessageResponse,
   MessageResponseArray,
 } from "../../message/types/MessageResponse";
+import { apiClient, wrap } from "../../utils/api";
 
 interface MessageAreaProps {
   sessionId: string | null;
@@ -63,7 +63,12 @@ export default function MessageArea(props: MessageAreaProps) {
 
     await createSessionIfNeeded(props.sessionId, props.setSessionId)
       .andThen((validSessionId) =>
-        sendPromptBySessionId(validSessionId, prompt),
+        wrap(
+          apiClient.sendPromptBySessionId({
+            params: { id: validSessionId },
+            body: prompt,
+          }),
+        ),
       )
       .match(
         () => {
@@ -84,7 +89,6 @@ export default function MessageArea(props: MessageAreaProps) {
 
   return (
     <div className="relative h-full flex flex-col overflow-hidden pt-14 md:pt-0">
-
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -202,3 +206,4 @@ export default function MessageArea(props: MessageAreaProps) {
     </div>
   );
 }
+

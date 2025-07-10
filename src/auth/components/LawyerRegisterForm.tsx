@@ -6,13 +6,13 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import clsx from "clsx";
 import type { LawyerRegister } from "../../lawyer/types/LawyerRegister";
 import { LawyerRegisterSchema } from "../../lawyer/schemas/LawyerRegisterSchema";
-import { sendLawyerRequest } from "../services/sendLawyerRequest";
 import type { RegisterRequest } from "../types/RegisterRequest";
 import { ResultAsync } from "neverthrow";
 import { useRef, useState } from "react";
 import { useClickOutside } from "../../common/hooks/useClickOutside";
 import type { LawyerSpecialization } from "../../lawyer/types/LawyerSpecialization";
 import { LawyerSpecializationLabels } from "../../lawyer/schemas/lawyerLabels";
+import { apiClient, wrap } from "../../utils/api";
 
 interface LawyerRegisterFormProps {
   registerForm: RegisterRequest;
@@ -36,6 +36,7 @@ export default function LawyerRegisterForm(props: LawyerRegisterFormProps) {
   } = useForm<LawyerRegister>({
     resolver: zodResolver(LawyerRegisterSchema),
     defaultValues: {
+      email: props.registerForm.email,
       tuitionNumber: "",
       contactPrice: 0,
       yearExperience: 0,
@@ -49,7 +50,7 @@ export default function LawyerRegisterForm(props: LawyerRegisterFormProps) {
   const mutation = useMutation({
     mutationFn: async (data: LawyerRegister) => {
       const userPromise = rg(props.registerForm);
-      const lawyerPromise = sendLawyerRequest(data);
+      const lawyerPromise = wrap(apiClient.sendLawyerRequest({ body: data }));
       return ResultAsync.combineWithAllErrors([userPromise, lawyerPromise]);
     },
 

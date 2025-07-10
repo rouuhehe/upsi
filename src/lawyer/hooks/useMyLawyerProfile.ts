@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "../../utils/api";
-import { LawyerResponseSchema } from "../schemas/LawyerResponseSchema";
+import { apiClient, wrap } from "../../utils/api";
+import {
+  LawyerResponseSchema,
+  type LawyerResponse,
+} from "../schemas/LawyerResponseSchema";
 
 export const useMyLawyerProfile = () => {
   return useQuery({
     queryKey: ["my-lawyer-profile"],
     queryFn: async () => {
-      const data = await apiClient.get("/api/lawyers/me");
+      const data = (
+        await wrap<LawyerResponse>(apiClient.findLawyerMe())
+      )._unsafeUnwrap();
       return LawyerResponseSchema.parse(data);
     },
     retry: false,

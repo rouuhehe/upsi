@@ -1,12 +1,14 @@
-import { login } from "../services/login";
-import { register } from "../services/register";
 import { createContext, useState, type ReactNode } from "react";
 import { ResultAsync } from "neverthrow";
 import type { RegisterRequest } from "../types/RegisterRequest";
 import type { LoginRequest } from "../types/LoginRequest";
+import { apiClient, wrap } from "../../utils/api";
+import type { AuthResponse } from "../types/AuthResponse";
 
 interface AuthContextType {
-  register: (registerRequest: RegisterRequest) => ResultAsync<void, Error>;
+  register: (
+    registerRequest: RegisterRequest,
+  ) => ResultAsync<AuthResponse, Error>;
   login: (loginRequest: LoginRequest) => ResultAsync<void, Error>;
   logout: () => void;
   session?: string | null;
@@ -22,19 +24,21 @@ export function AuthProvider(props: { children: ReactNode }) {
   });
 
   const loginHandler = (data: LoginRequest): ResultAsync<void, Error> => {
-    return login(data).map((res) => {
+    return wrap<AuthResponse>(apiClient.login({ body: data })).map((res) => {
       localStorage.setItem("token", res.token);
       setSession(res.token);
     });
   };
 
-  const registerHandler = (data: RegisterRequest): ResultAsync<void, Error> => {
-    return register(data)
-      .map(() => {})
-      .mapErr((err) => {
+  const registerHandler = (
+    data: RegisterRequest,
+  ): ResultAsync<AuthResponse, Error> => {
+    return wrap<AuthResponse>(apiClient.register({ body: data })).mapErr(
+      (err) => {
         console.error("Error al registrarse:", err);
         return err;
-      });
+      },
+    );
   };
 
   const logout = () => {

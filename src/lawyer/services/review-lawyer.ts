@@ -1,5 +1,5 @@
 import { ResultAsync } from "neverthrow";
-import { apiClient } from "../../utils/api";
+import { apiClient, wrap } from "../../utils/api";
 
 export function sendLawyerReview({
   lawyerId,
@@ -10,8 +10,10 @@ export function sendLawyerReview({
   rating: number;
   content: string;
 }): ResultAsync<{ success: boolean; message?: string }, Error> {
-  return ResultAsync.fromPromise(
-    apiClient.createLawyerReview({ rating, content }, { params: { lawyerId } }),
-    (error) => new Error("Error al enviar la reseña: " + JSON.stringify(error)),
+  return wrap(
+    apiClient.createLawyerReview({
+      body: { rating, content },
+      params: { lawyerId },
+    }),
   ).map(() => ({ success: true }));
 }

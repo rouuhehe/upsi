@@ -54,8 +54,11 @@ export const GuidePage = () => {
       <div className="flex-1 py-8">
         <GuideList
           filterType={filterType}
+          setFilterType={setFilterType}
           filterAge={filterAge}
+          setFilterAge={setFilterAge}
           searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
       </div>
     </div>
