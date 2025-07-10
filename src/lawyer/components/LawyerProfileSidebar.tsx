@@ -30,8 +30,6 @@ export function LawyerSidebar({
   const handleSubmitReview = async () => {
     if (rating === 0 || reviewText.trim() === "") return;
     if (!lawyer?.userId) return;
-
-
   };
 
   return (
@@ -79,7 +77,7 @@ export function LawyerSidebar({
             </h1>
             <StarRating value={summary.average} />
             <span className="text-sm mt-1 text-[var(--c-text)]/70">
-              ({summary.numReviews} reseñas)
+              ({summary.numReviews} reseña{summary.numReviews === 1 ? "" : "s"})
             </span>
           </div>
         ) : (

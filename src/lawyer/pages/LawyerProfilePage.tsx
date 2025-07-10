@@ -81,9 +81,9 @@ export default function LawyerProfilePage() {
                 </div>
               </div>
             ) : (
-              <p className="text-[var(--c-text)]/90 leading-relaxed">
+              <span className="text-[var(--c-text)]/90 leading-relaxed">
                 {localDescription}
-              </p>
+              </span>
             )}
           </p>
           {(lawyer?.email === user?.email || user?.roles.includes("ADMIN")) && (
