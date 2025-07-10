@@ -4,18 +4,15 @@ import type { ImageResponse } from "../types/ImageResponse";
 import axios from "axios";
 
 export function uploadProfileImage(
-  file: File,
+  file: File
 ): ResultAsync<ImageResponse, Error> {
-  const formData = new FormData();
-  formData.append("file", file);
-
   return ResultAsync.fromPromise(
-    apiClient.uploadProfileImage({ file }),
+    apiClient.post("/api/users/me/profile-image", { file }),
     (err) => {
       if (axios.isAxiosError(err)) {
         return new Error(err.message);
       }
       return new Error("Error uploading profile image");
-    },
+    }
   );
 }

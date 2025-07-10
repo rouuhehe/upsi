@@ -70,7 +70,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
       >
         <div className="flex items-center gap-4">
           <div className="w-20 h-20 bg-gradient-to-br from-sky-400 to-sky-500 rounded-2xl flex items-center justify-center shadow-sm">
-            <span className="text-[var(--c-text)] font-bold text-xl">
+            <span className="text-white font-bold text-xl">
               {lawyer.firstName[0]}
               {lawyer.lastName[0]}
             </span>
