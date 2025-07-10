@@ -14,6 +14,9 @@ export const LawyerResponseSchema = z.object({
   description: z.string().nullable(),
   specializations: z.array(z.string()),
   isPublic: z.boolean(),
+  numReviews: z.number(),
+  avgRating: z.number(),
+  imageURL: z.string().url().nullable(),
 });
 
 export type LawyerResponse = z.infer<typeof LawyerResponseSchema>;

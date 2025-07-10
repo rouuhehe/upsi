@@ -69,11 +69,19 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
         className="cursor-pointer bg-[var(--c-bg-soft)] rounded-2xl p-6 border  border-[var(--c-border)]/50  hover:shadow-md transition-all duration-300 group-hover:bg-[var(--c-bg)] ... flex items-center justify-between group"
       >
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 bg-gradient-to-br from-sky-400 to-sky-500 rounded-2xl flex items-center justify-center shadow-sm">
-            <span className="text-white font-bold text-xl">
-              {lawyer.firstName[0]}
-              {lawyer.lastName[0]}
-            </span>
+          <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center">
+            {lawyer.imageURL ? (
+              <img
+                src={lawyer.imageURL}
+                alt={`Foto de ${lawyer.firstName} ${lawyer.lastName}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-white font-bold text-xl">
+                {lawyer.firstName[0]}
+                {lawyer.lastName[0]}
+              </span>
+            )}
           </div>
 
           <div className="flex-1">
@@ -86,7 +94,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
                   (spec) =>
                     LawyerSpecializationLabels[
                       spec as keyof typeof LawyerSpecializationLabels
-                    ],
+                    ]
                 )
                 .join(", ")}
             </p>
@@ -136,7 +144,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
                         (spec) =>
                           LawyerSpecializationLabels[
                             spec as keyof typeof LawyerSpecializationLabels
-                          ],
+                          ]
                       )
                       .join(" - ")}
                   </p>

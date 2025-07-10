@@ -1,11 +1,12 @@
 import { useTheme } from "../hooks/useTheme";
 import { useClickOutside } from "../hooks/useClickOutside";
 import { Link, useNavigate } from "react-router-dom";
-import { UserCircle, Moon, LogOut, Sun } from "lucide-react";
+import { Moon, LogOut, Sun } from "lucide-react";
 import { useAuthContext } from "../../auth/hooks/useAuthContext";
 import { useRef, useState } from "react";
 import NavbarLink from "./NavbarLink";
 import { useCurrentUser } from "../../user/hooks/useCurrentUser";
+import { Avatar } from "../../image/components/Avatar";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -56,7 +57,10 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen((v) => !v)}
               className={userMenuBtnClass}
             >
-              <UserCircle className="w-7 h-7 text-sky-500" />
+              <Avatar
+                size="xs"
+                fallback="{user?.firstName?.charAt(0) || 'U'}"
+              />
             </button>
 
             {isMenuOpen && (
@@ -65,7 +69,10 @@ export default function Navbar() {
                 className="absolute right-0 top-12 w-64 bg-[var(--c-dropdown-bg)] border border-[var(--c-dropdown-border)] rounded-lg shadow-xl"
               >
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--c-border)] ">
-                  <UserCircle className="w-10 h-10 text-sky-500" />
+                   <Avatar
+                      size="xs"
+                      fallback="{user?.firstName?.charAt(0) || 'U'}"
+                    />
                   <button
                     onClick={() => navigate("/profile")}
                     className="flex flex-col text-left"

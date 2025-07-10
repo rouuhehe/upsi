@@ -35,15 +35,19 @@ export function LawyerSidebar({
   };
 
   return (
-    <aside className="mt-11 w-full md:w-[300px] p-7 ">
+    <aside className="mt-11 w-full md:w-[300px] p-7 md:sticky md:top-24 self-start">
       {lawyer ? (
         <>
           <div className="flex flex-col items-center">
             <img
-              src="/assets/lawyer-demo.jpg"
+              src={
+                lawyer.imageURL ??
+                "/assets/lawyer-demo.jpg" 
+              }
               alt="Foto del abogado"
               className="items-center justify-center w-32 h-32 rounded-3xl object-cover mb-4"
             />
+
           </div>
 
           <div className="mb-3">

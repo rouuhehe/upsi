@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { useUserSessions } from "../hooks/useUserSessions";
 import { sendPromptBySessionId } from "../services/sendPromptBySessionId";
 import { createSessionIfNeeded } from "../services/createSessionIfNeeded";
+import { Avatar } from "../../image";
 import type {
   MessageResponse,
   MessageResponseArray,
@@ -21,7 +22,6 @@ export default function MessageArea(props: MessageAreaProps) {
   const [localMessages, setLocalMessages] = useState<MessageResponseArray>([]);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
   const { refetch: refetchSessions } = useUserSessions();
   const { messages, refetch: refetchMessages } = useSessionMessages(
     props.sessionId,
@@ -114,7 +114,7 @@ export default function MessageArea(props: MessageAreaProps) {
                 />
               )}
               <div
-                className={`max-w-[85%] md:max-w-[70%] px-4 py-2 rounded-2xl ${
+                className={`max-w-[85%] md:max-w-[70%] px-4 py-1.5 mr-2 rounded-2xl ${
                   msg.role === "USER"
                     ? "ml-auto bg-[var(--c-chat-bubble)]"
                     : "bg-[var(--c-chat-bubble)]/90 backdrop-blur-sm"
@@ -125,11 +125,10 @@ export default function MessageArea(props: MessageAreaProps) {
                 </div>
               </div>
               {msg.role === "USER" && (
-                <img
-                  src="/assets/user-profile.jpg"
-                  alt="Usuario"
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full ml-2"
-                />
+                 <Avatar
+                      size="xs"
+                      fallback="{user?.firstName?.charAt(0) || 'U'}"
+                  />
               )}
             </div>
           ))}

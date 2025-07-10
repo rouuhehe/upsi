@@ -248,7 +248,7 @@ export default function LawyerListPage() {
                       <button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="flex items-center justify-center w-10 h-10 text-[var(--c-text)]/70 bg-white/5 rounded-full hover:bg-sky-50 hover:text-sky-400  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-[var(--c-text)]/70 disabled:hover:border-[var(--c-text)]/20 transition-all duration-200"
+                        className="flex items-center justify-center w-10 h-10 text-[var(--c-text)]/70 bg-white/5 rounded-full hover:bg-sky-400/20 hover:text-sky-400  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-[var(--c-text)]/70 disabled:hover:border-[var(--c-text)]/20 transition-all duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
