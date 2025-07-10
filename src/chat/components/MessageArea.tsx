@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import { useSessionMessages } from "../../message/hooks/useSessionMessages";
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useUserSessions } from "../hooks/useUserSessions";
 import { sendPromptBySessionId } from "../services/sendPromptBySessionId";
 import { createSessionIfNeeded } from "../services/createSessionIfNeeded";
@@ -27,7 +27,20 @@ export default function MessageArea(props: MessageAreaProps) {
     props.sessionId,
   );
 
-  const allMessages = [...(messages ?? []), ...localMessages];
+  const allMessages = useMemo(() => {
+    return [
+      ...(messages ?? []),
+      ...localMessages.filter(
+        (localMsg) =>
+          !(messages ?? []).some(
+            (msg) =>
+              msg.content === localMsg.content &&
+              msg.role === localMsg.role
+          )
+      ),
+    ];
+  }, [messages, localMessages]);
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
@@ -143,7 +156,7 @@ export default function MessageArea(props: MessageAreaProps) {
 
         {!messages && (
           <div className="absolute inset-0 flex flex-col items-center justify-start pt-24 md:pt-40 text-[var(--c-text)] space-y-6 z-50 pointer-events-none">
-            <h1 className="font-helvetica font-extrabold text-4xl md:text-6xl scale-x-105">
+            <h1 className="font-helvetica font-extrabold text-5xl md:text-6xl scale-x-105">
               LegalCheck
             </h1>
             <p className="text-base md:text-xl">¿Cómo puedo ayudarte?</p>

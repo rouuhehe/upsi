@@ -30,13 +30,13 @@ export default function AuthHomePage() {
             <div className="flex flex-col sm:flex-row gap-4 items-center w-full sm:w-auto">
               <Link
                 to="/auth/register"
-                className=" w-full sm:w-auto mt-6 cursor-pointer bg-sky-500 text-white px-6 sm:px-8 py-3 rounded-3xl transition-colors duration-300 hover:bg-black hover:text-white text-center"
+                className=" w-full sm:w-auto mt-6 cursor-pointer bg-sky-400 text-white px-6 sm:px-8 py-3 rounded-3xl transition-colors duration-300 hover:bg-sky-500 hover:text-white text-center"
               >
                 Regístrate
               </Link>
               <Link
                 to="/auth/login"
-                className="w-full sm:w-auto mt-2 sm:mt-6 cursor-pointer  text-sky-400 px-6 sm:px-8 py-3 rounded-3xl border border-sky-400 transition-colors duration-300 hover:bg-[var(--c-bg-hover)]  hover:text-white text-center"
+                className="w-full sm:w-auto mt-2 sm:mt-6 cursor-pointer  text-sky-400 px-6 sm:px-8 py-3 rounded-3xl border border-sky-400 transition-colors duration-300 hover:bg-[var(--c-bg-hover)]  text-center"
               >
                 Inicia Sesión
               </Link>
@@ -149,7 +149,7 @@ export default function AuthHomePage() {
 
           <Link
             to="/auth/register"
-            className="flex items-center gap-2 justify-center cursor-pointer bg-black hover:bg-sky-500 text-white px-6 sm:px-8 py-3 rounded-full transition duration-300 w-full sm:w-auto"
+            className="flex items-center gap-2 justify-center cursor-pointer bg-black hover:bg-neutral-800 text-white px-6 sm:px-8 py-3 rounded-full transition duration-300 w-full sm:w-auto"
           >
             Únete como abogado
             <MousePointer className="w-4 h-4 text-white font-light" />

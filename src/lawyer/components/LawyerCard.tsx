@@ -66,10 +66,10 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
     <div className="space-y-4">
       <div
         onClick={goToProfile}
-        className="cursor-pointer bg-[var(--c-dropdown-bg)] rounded-3xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:bg-[var(--c-bg)] ... flex items-center justify-between group"
+        className="cursor-pointer bg-[var(--c-bg-soft)] rounded-2xl p-6 border  border-[var(--c-border)]/50  hover:shadow-md transition-all duration-300 group-hover:bg-[var(--c-bg)] ... flex items-center justify-between group"
       >
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-sky-400 to-sky-500 rounded-2xl flex items-center justify-center shadow-sm">
+          <div className="w-20 h-20 bg-gradient-to-br from-sky-400 to-sky-500 rounded-2xl flex items-center justify-center shadow-sm">
             <span className="text-[var(--c-text)] font-bold text-xl">
               {lawyer.firstName[0]}
               {lawyer.lastName[0]}
