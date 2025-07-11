@@ -182,7 +182,7 @@ const contract = c.router(
       path: "/api/guides",
       body: GuideRequestSchema,
       responses: {
-        200: GuideSchema,
+        201: GuideSchema,
         ...defaultErrors,
       },
     },

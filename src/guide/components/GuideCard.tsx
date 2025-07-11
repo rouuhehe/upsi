@@ -8,17 +8,25 @@ interface GuideCardProps {
   id: string;
   title: string;
   type: GuideType;
-  authorId: string;
   createdAt: string;
+  authorId: string;
+  content: string;
 }
 
-
-const GuideCard = ({ id, title, type, createdAt }: GuideCardProps) => {
+const GuideCard = ({
+  id,
+  title,
+  type,
+  createdAt,
+  authorId,
+}: GuideCardProps) => {
   const navigate = useNavigate();
   const { user } = useCurrentUser();
 
   const canEdit =
-    user && (user.roles.includes("ADMIN") || user.roles.includes("LAWYER"));
+    user &&
+    (user.roles.includes("ADMIN") ||
+      (user.roles.includes("LAWYER") && authorId === user.id));
 
   const formattedDate = useMemo(() => {
     return new Date(createdAt).toLocaleDateString("es-ES", {
@@ -77,9 +85,7 @@ const GuideCard = ({ id, title, type, createdAt }: GuideCardProps) => {
             <span>Editar</span>
           </button>
         ) : (
-          <span className="text-sm text-sky-500 font-medium ">
-            Leer más →
-          </span>
+          <span className="text-sm text-sky-500 font-medium ">Leer más →</span>
         )}
       </div>
     </div>

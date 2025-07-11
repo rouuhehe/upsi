@@ -2,6 +2,7 @@ import { z } from "zod";
 import { UserRolesSetSchema } from "./UserRoleSchema";
 
 export const UserResponseSchema = z.object({
+  id: z.string().uuid(),
   roles: UserRolesSetSchema,
   firstName: z.string(),
   lastName: z.string(),
