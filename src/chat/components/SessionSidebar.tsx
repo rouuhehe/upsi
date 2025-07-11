@@ -1,20 +1,16 @@
 import { Trash2 } from "lucide-react";
 import { useUserSessions } from "../hooks/useUserSessions";
-import { useState } from "react";
 import clsx from "clsx";
 import type { SessionResponse } from "../types/SessionResponse";
-import ConfirmModal from "../../common/components/ConfirmModal";
-import { apiClient, wrap } from "../../utils/api";
 
 interface SessionSidebarProps {
   sessionId: string | null;
   setSessionId: (id: string | null) => void;
+  setSessionToDelete: (session: SessionResponse | null) => void;
 }
 
 export default function SessionSidebar(props: SessionSidebarProps) {
-  const [sessionToDelete, setSessionToDelete] =
-    useState<SessionResponse | null>(null);
-  const { sessions, isLoading, refetch } = useUserSessions();
+  const { sessions, isLoading } = useUserSessions();
 
   return (
     <div className="w-60 h-screen flex flex-col  bg-[var(--c-bg)]">
@@ -76,7 +72,7 @@ export default function SessionSidebar(props: SessionSidebarProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSessionToDelete(session);
+                      props.setSessionToDelete(session);
                     }}
                     className="cursor-pointer text-red-400 hover:text-red-600 hover:bg-[var(--c-trash-bg)] rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition ml-2"
                     title="Eliminar chat"
@@ -86,25 +82,6 @@ export default function SessionSidebar(props: SessionSidebarProps) {
                 </li>
               ))}
           </ul>
-        )}
-
-        {/* Modal de confirmación */}
-        {sessionToDelete && (
-          <ConfirmModal
-            message={`"${sessionToDelete.title?.trim() || "Sin título"}"`}
-            onConfirm={async () => {
-              await wrap(
-                apiClient.deleteSessionById({
-                  params: { id: sessionToDelete.id },
-                }),
-              );
-              if (sessionToDelete.id === props.sessionId)
-                props.setSessionId(null);
-              setSessionToDelete(null);
-              refetch();
-            }}
-            onCancel={() => setSessionToDelete(null)}
-          />
         )}
       </div>
     </div>

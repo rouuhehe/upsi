@@ -104,7 +104,7 @@ const contract = c.router(
     },
     deleteSessionById: {
       method: "DELETE",
-      path: "/api/ai/chat/session/:id",
+      path: "/api/ai/chat/sessions/:id",
       responses: {
         204: z.void(),
         ...defaultErrors,
