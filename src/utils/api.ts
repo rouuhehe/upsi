@@ -121,7 +121,7 @@ const contract = c.router(
     sendPromptBySessionId: {
       method: "POST",
       path: "/api/ai/chat/message/:id",
-      body: z.string(),
+      body: z.object({ prompt: z.string() }),
       responses: {
         200: z.string(),
         ...defaultErrors,
@@ -234,7 +234,7 @@ const contract = c.router(
       path: "/api/contact/lawyers/:lawyerId",
       body: LawyerContactRequestSchema,
       responses: {
-        200: z.unknown(),
+        200: z.void(),
         ...defaultErrors,
       },
     },
@@ -277,7 +277,7 @@ const contract = c.router(
       path: "/api/reviews/:lawyerId",
       body: ReviewRequestSchema,
       responses: {
-        200: z.unknown(),
+        200: z.void(),
         ...defaultErrors,
       },
     },

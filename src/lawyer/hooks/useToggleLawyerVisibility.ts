@@ -7,9 +7,7 @@ export const useToggleLawyerVisibility = () => {
   return useMutation({
     mutationFn: async (isPublic: boolean) =>
       (
-        await wrap<void>(
-          apiClient.toggleLawyerVisibility({ query: { isPublic } }),
-        )
+        await wrap(apiClient.toggleLawyerVisibility({ query: { isPublic } }))
       )._unsafeUnwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-lawyer-profile"] });

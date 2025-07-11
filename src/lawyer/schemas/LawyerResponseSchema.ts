@@ -8,12 +8,15 @@ export const LawyerResponseSchema = z.object({
   email: z.string().email(),
   phoneNumber: z.string(),
   tuitionNumber: z.string(),
-  yearExperience: z.number(),
   contactPrice: z.number(),
-  province: z.string().nullable(),
+  yearExperience: z.number(),
+  province: z.string(),
+  isPublic: z.boolean(),
   description: z.string().nullable(),
   specializations: z.array(z.string()),
-  isPublic: z.boolean(),
+  numReviews: z.number(),
+  avgRating: z.number(),
+  imageURL: z.string().nullable(),
 });
 
 export type LawyerResponse = z.infer<typeof LawyerResponseSchema>;

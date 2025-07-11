@@ -76,8 +76,6 @@ export default function LawyerListPage() {
     filters.minExperience !== null ||
     filters.maxPrice !== null;
 
-
-
   return (
     <div className="relative flex min-h-screen bg-[var(--c-bg)]">
       {isSidebarOpen && (
@@ -227,7 +225,12 @@ export default function LawyerListPage() {
                 {totalPages > 1 && (
                   <div className="flex flex-col items-center space-y-4 mt-12 pt-8 border-t border-[var(--c-text)]/10">
                     <div className="text-sm text-[var(--c-text)]/60 text-center">
-                      Mostrando {((currentPage - 1) * lawyersPerPage) + 1} - {Math.min(currentPage * lawyersPerPage, filteredLawyers.length)} de {filteredLawyers.length} abogados
+                      Mostrando {(currentPage - 1) * lawyersPerPage + 1} -{" "}
+                      {Math.min(
+                        currentPage * lawyersPerPage,
+                        filteredLawyers.length,
+                      )}{" "}
+                      de {filteredLawyers.length} abogados
                     </div>
 
                     <div className="flex items-center space-x-4">
@@ -236,8 +239,18 @@ export default function LawyerListPage() {
                         disabled={currentPage === 1}
                         className="flex items-center justify-center w-10 h-10 text-[var(--c-text)]/70 bg-white/5 rounded-full hover:bg-sky-50 hover:text-sky-400  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-[var(--c-text)]/70 disabled:hover:border-[var(--c-text)]/20 transition-all duration-200"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
                         </svg>
                       </button>
 
@@ -248,15 +261,23 @@ export default function LawyerListPage() {
                       <button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="flex items-center justify-center w-10 h-10 text-[var(--c-text)]/70 bg-white/5 rounded-full hover:bg-sky-50 hover:text-sky-400  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-[var(--c-text)]/70 disabled:hover:border-[var(--c-text)]/20 transition-all duration-200"
+                        className="flex items-center justify-center w-10 h-10 text-[var(--c-text)]/70 bg-white/5 rounded-full hover:bg-sky-400/20 hover:text-sky-400  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-[var(--c-text)]/70 disabled:hover:border-[var(--c-text)]/20 transition-all duration-200"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                     </div>
-
-
                   </div>
                 )}
               </>
@@ -267,3 +288,4 @@ export default function LawyerListPage() {
     </div>
   );
 }
+

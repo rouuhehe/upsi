@@ -23,6 +23,7 @@ export const LawyerRegisterSchema = z.object({
       invalid_type_error: "El precio debe ser un número válido",
     })
     .min(0, "Los años de experiencia no pueden ser negativos")
+    .max(100, "Por favor ingresar una cantidad razonable")
     .refine((value) => {
       return !isNaN(Number(value));
     }, "Los años de experiencia deben ser un número válido"),

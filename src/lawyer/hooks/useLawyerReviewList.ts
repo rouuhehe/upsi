@@ -10,30 +10,30 @@ export function useLawyerReviewList(lawyerId: string) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReviews = useCallback(
-    (): ResultAsync<Review[], string> =>
-      ResultAsync.fromPromise(
-        apiClient.listLawyerReviews({ params: { lawyerId } }),
-        (e: unknown) => {
-          const error = e as {
-            response?: { data?: { message?: string } };
-            cause?: Array<{ message?: string }>;
-          };
-          const msg =
-            error?.response?.data?.message ??
-            error?.cause?.[0]?.message ??
-            "No se pudieron cargar las reseñas.";
-          return msg;
-        },
-      ).andThen((res) => {
-        if (res.status === 200) {
-          return ok(res.body);
-        }
+  const fetchReviews = useCallback(() => {
+    const task = ResultAsync.fromPromise(
+      apiClient.listLawyerReviews({ params: { lawyerId } }),
+      (e: unknown) => {
+        const error = e as {
+          response?: { data?: { message?: string } };
+          cause?: Array<{ message?: string }>;
+        };
+        const msg =
+          error?.response?.data?.message ??
+          error?.cause?.[0]?.message ??
+          "No se pudieron cargar las reseñas.";
+        return msg;
+      },
+    ).andThen((res) => {
+      if (res.status === 200) {
+        return ok(res.body);
+      }
 
-        return err(res.body.message);
-      }),
-    [lawyerId],
-  );
+      return err(res.body.message);
+    });
+    task.match(setReviews, setError);
+    return task;
+  }, [lawyerId]);
 
   useEffect(() => {
     fetchReviews().match(

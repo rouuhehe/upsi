@@ -9,7 +9,7 @@ export function ProtectedRoute() {
     if (location.pathname === "/welcome") {
       return <Navigate to="/home" replace />;
     }
-    return <Navigate to={`/auth/register?from=${location.pathname}`} replace />;
+    return <Navigate to={`/auth/login?from=${location.pathname}`} replace />;
   }
 
   return <Outlet />;

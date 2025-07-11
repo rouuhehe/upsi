@@ -9,6 +9,8 @@ import type {
   MessageResponseArray,
 } from "../../message/types/MessageResponse";
 import { apiClient, wrap } from "../../utils/api";
+import { Avatar } from "../../image/components/Avatar";
+import { useCurrentUser } from "../../user/hooks/useCurrentUser";
 
 interface MessageAreaProps {
   sessionId: string | null;
@@ -16,6 +18,8 @@ interface MessageAreaProps {
 }
 
 export default function MessageArea(props: MessageAreaProps) {
+  const { user } = useCurrentUser();
+
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [localMessages, setLocalMessages] = useState<MessageResponseArray>([]);
@@ -34,13 +38,11 @@ export default function MessageArea(props: MessageAreaProps) {
         (localMsg) =>
           !(messages ?? []).some(
             (msg) =>
-              msg.content === localMsg.content &&
-              msg.role === localMsg.role
-          )
+              msg.content === localMsg.content && msg.role === localMsg.role,
+          ),
       ),
     ];
   }, [messages, localMessages]);
-
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
@@ -66,7 +68,7 @@ export default function MessageArea(props: MessageAreaProps) {
         wrap(
           apiClient.sendPromptBySessionId({
             params: { id: validSessionId },
-            body: prompt,
+            body: { prompt },
           }),
         ),
       )
@@ -118,7 +120,7 @@ export default function MessageArea(props: MessageAreaProps) {
                 />
               )}
               <div
-                className={`max-w-[85%] md:max-w-[70%] px-4 py-2 rounded-2xl ${
+                className={`max-w-[85%] md:max-w-[70%] px-4 py-1.5 mr-2 rounded-2xl ${
                   msg.role === "USER"
                     ? "ml-auto bg-[var(--c-chat-bubble)]"
                     : "bg-[var(--c-chat-bubble)]/90 backdrop-blur-sm"
@@ -129,11 +131,7 @@ export default function MessageArea(props: MessageAreaProps) {
                 </div>
               </div>
               {msg.role === "USER" && (
-                <img
-                  src="/assets/user-profile.jpg"
-                  alt="Usuario"
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full ml-2"
-                />
+                <Avatar size="xs" fallback={user?.firstName.charAt(0) || "U"} />
               )}
             </div>
           ))}
@@ -206,4 +204,3 @@ export default function MessageArea(props: MessageAreaProps) {
     </div>
   );
 }
-

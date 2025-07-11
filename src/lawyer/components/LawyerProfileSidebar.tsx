@@ -5,6 +5,7 @@ import { LawyerRatingSummarySchema } from "../schemas/LawyerRatingSummarySchema"
 import { Mail, MapPin } from "lucide-react";
 import { hasCooldown } from "../../utils/contactCooldown";
 import { useState } from "react";
+import { apiClient, wrap } from "../../utils/api";
 
 type LawyerRatingSummary = z.infer<typeof LawyerRatingSummarySchema>;
 
@@ -12,10 +13,12 @@ export function LawyerSidebar({
   lawyer,
   summary,
   error,
+  reloadReviews,
 }: {
   lawyer: LawyerResponse | null;
   summary: LawyerRatingSummary | null;
   error?: string | null;
+  reloadReviews: () => void;
 }) {
   const canReview = lawyer?.id ? !hasCooldown(lawyer.id) : false;
 
@@ -30,15 +33,33 @@ export function LawyerSidebar({
   const handleSubmitReview = async () => {
     if (rating === 0 || reviewText.trim() === "") return;
     if (!lawyer?.userId) return;
+
+    const result = await wrap(
+      apiClient.createLawyerReview({
+        body: { content: reviewText.trim(), rating },
+        params: { lawyerId: lawyer.id },
+      }),
+    );
+
+    if (result.isOk()) {
+      alert("Reseña enviada con éxito");
+      setShowReviewForm(false);
+      setRating(0);
+      setReviewText("");
+      reloadReviews();
+    } else {
+      console.error(result.error);
+      alert(result.error.message || "No se pudo enviar la reseña");
+    }
   };
 
   return (
-    <aside className="mt-11 w-full md:w-[300px] p-7 ">
+    <aside className="mt-11 w-full md:w-[300px] p-7 md:sticky md:top-24 self-start">
       {lawyer ? (
         <>
           <div className="flex flex-col items-center">
             <img
-              src="/assets/lawyer-demo.jpg"
+              src={lawyer.imageURL ?? "/assets/lawyer-demo.jpg"}
               alt="Foto del abogado"
               className="items-center justify-center w-32 h-32 rounded-3xl object-cover mb-4"
             />

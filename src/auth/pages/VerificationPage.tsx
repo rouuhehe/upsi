@@ -38,9 +38,7 @@ export default function VerificationPage() {
       if (!rawToken) throw new Error("Missing token");
 
       return (
-        await wrap<void>(
-          apiClient.resendVerification({ query: { token: rawToken } }),
-        )
+        await wrap(apiClient.resendVerification({ query: { token: rawToken } }))
       )._unsafeUnwrap();
     },
 
