@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient, wrap } from "../../utils/api";
 import { LawyerSpecializationLabels } from "../schemas/lawyerLabels";
+import { useLawyerReview } from "../hooks/useLawyerReview";
 
 export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
   const [showForm, setShowForm] = useState(false);
@@ -11,6 +12,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
   const [isSending, setIsSending] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const navigate = useNavigate();
+  const { summary } = useLawyerReview(lawyer.id);
 
   const goToProfile = () => {
     navigate(`/lawyers/${lawyer.id}`);
@@ -71,7 +73,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
         className="cursor-pointer bg-[var(--c-bg-soft)] rounded-2xl p-6 border  border-[var(--c-border)]/50  hover:shadow-md transition-all duration-300 group-hover:bg-[var(--c-bg)] ... flex items-center justify-between group"
       >
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center">
+          <div className="w-25 h-25 rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center">
             {lawyer.imageURL ? (
               <img
                 src={lawyer.imageURL}
@@ -91,6 +93,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
             <h2 className="text-xl font-bold text-[var(--c-text)]/90 group-hover:text-sky-400 transition-colors">
               {lawyer.firstName} {lawyer.lastName}
             </h2>
+            
             <p className="text-sm text-sky-400 font-medium">
               {lawyer.specializations
                 .map(
@@ -102,34 +105,50 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
                 .join(", ")}
             </p>
             <p className="text-sm font-semibold text-[var(--c-text)]/90 mt-1">
-              PEN S/.{lawyer.contactPrice} por consulta
+              {lawyer.province === "LIMA" ? "Lima Metropolitana" : "Fuera de Lima"}
             </p>
+            <p className="text-sm font-bold text-[var(--c-text)]/90 mt-1">
+              S/.{lawyer.contactPrice} por consulta
+            </p>
+            
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-1">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleForm();
-            }}
-            className="hover:border-sky-500 mb-1 hover:bg-sky-200/10 border-2 border-sky-400 text-sky-400 font-semibold py-2 px-4 rounded-xl transition-all duration-200 text-sm"
-          >
-            Contactar Ahora
-          </button>
-          {isBlocked && (
-            <span className="text-xs text-[var(--c-text)]/70 bold">
-              Espera antes de volver a contactar
-            </span>
-          )}
+        <div className="flex items-center gap-1 text-[var(--c-text)] text-sm font-semibold">
+          
+          <span>{summary?.average?.toFixed(1) ?? "Sin calificación"}</span>
+            <svg
+              className="w-4 h-4"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.36 2.44a1 1 0 00-.364 1.118l1.287 3.951c.3.92-.755 1.688-1.54 1.118l-3.36-2.44a1 1 0 00-1.176 0l-3.36 2.44c-.784.57-1.838-.198-1.539-1.119l1.287-3.95a1 1 0 00-.364-1.118L2.075 9.377c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.95z" />
+          </svg>
+          
         </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleToggleForm();
+          }}
+          className="hover:border-sky-500 mb-1 hover:bg-sky-200/10 border-2 border-sky-400 text-sky-400 font-semibold py-2 px-4 rounded-xl transition-all duration-200 text-sm"
+        >
+          Contactar Ahora
+        </button>
+
+        {isBlocked && (
+          <span className="text-xs text-[var(--c-text)]/70 bold">
+            Espera antes de volver a contactar
+          </span>
+        )}
       </div>
 
-      {/* Formulario de contacto */}
+      </div>
+
       {showForm && (
         <div className="bg-[var(--c-dropdown-bg)] border border-[var(--c-border)] rounded-2xl p-6 shadow-sm transition-all duration-300">
           <div className="flex flex-col md:flex-row items-start gap-6">
-            {/* Info del abogado */}
             <div className="flex flex-col items-start">
               <h1 className="text-2xl font-bold text-sky-400 mb-4">
                 Contactar Ahora
@@ -166,7 +185,6 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
               </div>
             </div>
 
-            {/* Formulario */}
             <div className="flex-1">
               <form
                 className="space-y-4"

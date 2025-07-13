@@ -49,7 +49,7 @@ export default function LawyerProfilePage() {
         lawyer={lawyer}
         summary={summary}
         error={lawyerError}
-        reloadReviews={reloadReviews}
+        reloadReviews={() => reloadReviews(lawyerId || "")}
       />
 
       <main className="mt-22 flex-1 px-6 py-* space-y-3">
@@ -92,7 +92,7 @@ export default function LawyerProfilePage() {
                             query: { newDescription: localDescription },
                           }),
                         );
-                        reloadLawyer();
+                        reloadLawyer(lawyerId);
                         setEditingDescription(false);
                       }
                     }}
