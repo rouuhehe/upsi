@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { apiClient } from "../../utils/api";
 import { err, ok, ResultAsync } from "neverthrow";
 import { sendLawyerReview } from "../services/review-lawyer";
@@ -12,7 +12,7 @@ export function useLawyerReview(lawyerId: string) {
   const [summary, setSummary] = useState<ReviewSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSummary = useCallback(() => {
+  const fetchSummary = () => {
     const result = ResultAsync.fromPromise(
       apiClient.getLawyerReviewSummary({ params: { lawyerId } }),
       (e) => {
@@ -46,7 +46,7 @@ export function useLawyerReview(lawyerId: string) {
       });
 
     return result;
-  }, [lawyerId]);
+  };
 
   const submitReview = (
     rating: number,
