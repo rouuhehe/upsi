@@ -157,3 +157,13 @@ input:-webkit-autofill:active {
   background-color: var(--c-bg) !important;
   color: #000 !important;
 }
+
+@theme {
+  --animate-pop: pop 0.2s ease-out;
+
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(0.97); }
+    100% { transform: scale(1); }
+  }
+}

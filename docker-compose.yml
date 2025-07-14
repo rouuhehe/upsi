@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: "postgres:17"
+    container_name: "dbp-database"
+    environment:
+      POSTGRES_DB: "dbp"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: 123
+    ports:
+      - 5555:5432
+    volumes:
+      - "./data:/data"

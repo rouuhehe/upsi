@@ -2,16 +2,18 @@ import { useParams } from "react-router-dom";
 import { useLawyerReview } from "../hooks/useLawyerReview";
 import { useLawyerReviewList } from "../hooks/useLawyerReviewList";
 import { usePublicLawyerById } from "../hooks/usePublicLawyerById";
-import { Star } from "lucide-react";
+import { Star, GraduationCap } from "lucide-react";
 import { LawyerSidebar } from "../components/LawyerProfileSidebar";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "../../user/hooks/useCurrentUser";
 import { apiClient, wrap } from "../../utils/api";
 import type { LawyerResponse } from "../schemas/LawyerResponseSchema";
+import {LawyerSpecializationLabels} from "../schemas/lawyerLabels.ts";
 
 export default function LawyerProfilePage() {
   const { lawyerId } = useParams<{ lawyerId: string }>();
   const { user } = useCurrentUser();
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   const {
     lawyer,
@@ -29,6 +31,8 @@ export default function LawyerProfilePage() {
   const [localDescription, setLocalDescription] = useState(
     lawyer?.description ?? "Este usuario no tiene descripción",
   );
+  const descriptionLines = localDescription.split("\n");
+  const visibleLines = showFullDescription ? descriptionLines : descriptionLines.slice(0, 8);
 
   useEffect(() => {
     if (lawyer?.description !== undefined && lawyer?.description !== null) {
@@ -43,6 +47,65 @@ export default function LawyerProfilePage() {
   }, [lawyerId, reloadSummary]);
 
   if (!lawyerId) return <p>Abogado no encontrado.</p>;
+
+  const [showForm, setShowForm] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  useEffect(() => {
+    const checkBlocked = async () => {
+      if (!lawyer?.id) return;
+      try {
+        const contacted = (
+            await wrap<boolean>(
+                apiClient.hasContactedLawyer({ params: { lawyerId: lawyer.id } })
+            )
+        )._unsafeUnwrap();
+        setIsBlocked(contacted);
+      } catch (err) {
+        console.error("Error verificando contacto:", err);
+      }
+    };
+    checkBlocked();
+  }, [lawyer?.id]);
+
+  const handleSend = async () => {
+    setIsSending(true);
+    const result = await wrap(
+        apiClient.sendLawyerContact({
+          body: { subject, message },
+          params: { lawyerId: lawyer!.id },
+        })
+    );
+
+    if (result.isOk()) {
+      alert("Correo enviado con éxito");
+      setIsBlocked(true);
+      setShowForm(false);
+      setSubject("");
+      setMessage("");
+    } else {
+      console.error("Error enviando:", result.error);
+    }
+
+    setIsSending(false);
+  };
+
+  const handleToggleForm = () => {
+    if (isBlocked) {
+      alert("Ya contactaste a este abogado. Intenta nuevamente más tarde.");
+      return;
+    }
+    setShowForm(!showForm);
+  };
+
+  const maxChars = 400;
+  const isTooLong = localDescription.length > maxChars;
+  const shortDescription = localDescription.slice(0, maxChars);
+
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen text-[var(--c-text)]">
       <LawyerSidebar
@@ -53,27 +116,115 @@ export default function LawyerProfilePage() {
       />
 
       <main className="mt-22 flex-1 px-6 py-* space-y-3">
-        <h2 className="text-2xl font-bold text-[var(--c-text)] flex items-center gap-2">
-          <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
+        <div className="flex flex-col md:flex-row items-baseline justify-between">
+          <div>
+            <div className="mt-2 flex items-center gap-2 text-4xl font-semibold text-[var(--c-text)]">
+              Dr. {lawyer?.firstName} {lawyer?.lastName}
+            </div>
+            <div className="mt-4 mb-4">
+              <h3 className="flex items-center text-[var(--c-text)]/90 font-semibold text-lg mb-2">
+                <GraduationCap className="w-5 h-5 text-black mr-2" />
+                Especializaciones
+              </h3>
+
+              <div className="ml-8 flex flex-wrap items-center justify-start gap-3">
+                {lawyer?.specializations.map((spec) => (
+                    <span
+                        key={spec}
+                        className="bg-blue-800 text-white text-sm font-light px-4 py-0.5 rounded-full"
+                    >
+                  Derecho{" "}
+                      {
+                        LawyerSpecializationLabels[
+                            spec as keyof typeof LawyerSpecializationLabels
+                            ]
+                      }
+                </span>
+                ))}
+              </div>
+            </div>
           </div>
-          Sobre {lawyer?.firstName} {lawyer?.lastName}
+          <div className="flex flex-col items-end">
+            <div className="bg-gradient-to-r from-sky-400 to-blue-500 p-[1px] rounded-xl">
+              <button
+                  onClick={handleToggleForm}
+                  className="cursor-pointer bg-[var(--c-bg)] text-sky-500 font-semibold py-2 px-4 rounded-xl text-sm transition-all duration-200 hover:bg-gradient-to-r from-sky-400 to-blue-500 hover:text-white"
+              >
+                Contactar Ahora
+              </button>
+            </div>
+            {isBlocked && (
+                <span className="text-xs text-[var(--c-text)]/70 bold mt-1">
+                  Espera antes de volver a contactar
+                </span>
+            )}
+          </div>
+        </div>
+
+        {showForm && (
+            <div className="bg-[var(--c-dropdown-bg)] border border-[var(--c-border)] rounded-2xl p-6 shadow-sm transition-all duration-300 mt-4">
+              <form
+                  className="space-y-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSend();
+                  }}
+              >
+                <div>
+                  <label className="block text-sm font-medium text-[var(--c-text)]/70 mb-1">
+                    Asunto <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                      type="text"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      className="text-[var(--c-text)] w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                      placeholder="Consulta legal sobre..."
+                      required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[var(--c-text)]/70 mb-1">
+                    Mensaje <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                      className="text-[var(--c-text)] w-full border border-gray-300 rounded-lg p-3 pb-8 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      rows={4}
+                      placeholder="Describe tu situación legal..."
+                      required
+                  />
+                </div>
+
+                <div className="flex justify-end mt-4">
+                  <button
+                      type="submit"
+                      disabled={isSending}
+                      className="cursor-pointer border-lime-400 border-2 hover:border-lime-600 hover:text-lime-600 text-lime-500 text-md font-semibold py-2 px-4 rounded-full transition-all duration-200 flex items-center gap-2"
+                  >
+                    Enviar correo
+                    <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M2.01 21l20.99-9L2.01 3v7l15 2-15 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+        )}
+
+        <h2 className="mt-8 text-2xl font-bold text-[var(--c-text)] flex items-center gap-2">
+          Sobre mí
         </h2>
 
-        <section className="bg-[var(--c-dropdown-bg)] rounded-xl shadow-sm  overflow-hidden">
-          <div className="p-6">
+        <section>
+          <div className="mt-4 p-1 mr-8">
             {editingDescription ? (
               <div className="space-y-2">
                 <textarea
@@ -109,10 +260,21 @@ export default function LawyerProfilePage() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                <p className="text-[var(--c-text)]/70 leading-relaxed text-lg">
-                  {localDescription}
+              <div>
+                <p className="whitespace-pre-line leading-relaxed text-[var(--c-text)]/80">
+                  {showFullDescription || !isTooLong
+                      ? localDescription
+                      : shortDescription + "..."}
                 </p>
+                {isTooLong && (
+                    <button
+                        onClick={() => setShowFullDescription(!showFullDescription)}
+                        className="cursor-pointer text-sky-400 hover:text-sky-500 text-sm underline"
+                    >
+                      {showFullDescription ? "Mostrar menos" : "Leer más"}
+                    </button>
+                )}
+
                 {(lawyer?.email === user?.email ||
                   user?.roles.includes("ADMIN")) && (
                   <button
@@ -139,98 +301,67 @@ export default function LawyerProfilePage() {
             )}
           </div>
         </section>
+
         {/* Reseñas */}
         <h2 className="mt-10 text-2xl font-bold text-[var(--c-text)] flex items-center gap-2">
-          <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-          </div>
-          Reseñas de otros usuarios
+          Reseñas de clientes
         </h2>
 
-        <section className="mb-10 bg-[var(--c-dropdown-bg)] rounded-xl shadow-sm  overflow-hidden">
-          <div className="p-6">
+        <section className="mb-10">
+          <div className="p-2">
             {listError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5 text-red-500"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
-                  <span className="text-red-700 font-medium">{listError}</span>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    </svg>
+                    <span className="text-red-700 font-medium">{listError}</span>
+                  </div>
                 </div>
-              </div>
             )}
 
             {reviews.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-[var(--c-bg-hover2)] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                    />
-                  </svg>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[var(--c-bg-hover2)] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-lg mb-2">No hay reseñas aún</p>
+                  <p className="text-gray-400">Sé el primero en dejar una reseña</p>
                 </div>
-                <p className="text-gray-500 text-lg mb-2">No hay reseñas aún</p>
-                <p className="text-gray-400">
-                  Sé el primero en dejar una reseña
-                </p>
-              </div>
             ) : (
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="bg-gray-50 rounded-lg p-5 border border-gray-200 hover:shadow-md transition-shadow duration-200"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-sky-400 to-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-semibold text-sm">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {reviews.map((review) => (
+                      <div
+                          key={review.id}
+                          className="bg-[var(--c-bg)] text-[var(--c-text)] rounded-xl border border-[var(--c-border)] hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col justify-between h-full"
+                      >
+                        <p className="text-[var(--c-text)]/90 text-base mb-6 leading-relaxed">
+                          {review.content}
+                        </p>
+                        <div className="flex items-center gap-4 mt-auto">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white font-semibold text-sm">
                             {review.reviewerFirstName[0]}
                             {review.reviewerLastName[0]}
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-800">
-                            {review.reviewerFirstName} {review.reviewerLastName}
-                          </h4>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-[var(--c-text)]">
+                              {review.reviewerFirstName} {review.reviewerLastName}
+                            </p>
+                            <p className="text-xs text-[var(--c-text)]/60">
+                              {new Date(review.createdAt).toLocaleDateString("es-ES", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                            </p>
+                          </div>
                           <StarRating value={review.rating} />
                         </div>
                       </div>
-                      <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full">
-                        {new Date(review.createdAt).toLocaleDateString(
-                          "es-ES",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          },
-                        )}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed pl-0 sm:pl-13">
-                      {review.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
             )}
           </div>
         </section>

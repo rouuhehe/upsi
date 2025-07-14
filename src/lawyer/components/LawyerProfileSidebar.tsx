@@ -1,20 +1,20 @@
-import { Star } from "lucide-react";
-import type { LawyerResponse } from "../schemas/LawyerResponseSchema";
-import type { z } from "zod";
-import { LawyerRatingSummarySchema } from "../schemas/LawyerRatingSummarySchema";
-import { Mail, MapPin } from "lucide-react";
-import { hasCooldown } from "../../utils/contactCooldown";
+import { X, Star, Mail, MapPin, Pencil, BriefcaseBusiness } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useState } from "react";
+import type { z } from "zod";
+import type { LawyerResponse } from "../schemas/LawyerResponseSchema";
+import { LawyerRatingSummarySchema } from "../schemas/LawyerRatingSummarySchema";
+import { hasCooldown } from "../../utils/contactCooldown";
 import { apiClient, wrap } from "../../utils/api";
 
 type LawyerRatingSummary = z.infer<typeof LawyerRatingSummarySchema>;
 
 export function LawyerSidebar({
-  lawyer,
-  summary,
-  error,
-  reloadReviews,
-}: {
+                                lawyer,
+                                summary,
+                                error,
+                                reloadReviews,
+                              }: {
   lawyer: LawyerResponse | null;
   summary: LawyerRatingSummary | null;
   error?: string | null;
@@ -35,10 +35,10 @@ export function LawyerSidebar({
     if (!lawyer?.userId) return;
 
     const result = await wrap(
-      apiClient.createLawyerReview({
-        body: { content: reviewText.trim(), rating },
-        params: { lawyerId: lawyer.id },
-      }),
+        apiClient.createLawyerReview({
+          body: { content: reviewText.trim(), rating },
+          params: { lawyerId: lawyer.id },
+        }),
     );
 
     if (result.isOk()) {
@@ -54,132 +54,208 @@ export function LawyerSidebar({
   };
 
   return (
-    <aside className="mt-11 w-full md:w-[300px] p-7 md:sticky md:top-24 self-start">
-      {lawyer ? (
-        <>
-          <div className="flex flex-col items-center">
-            <img
-              src={lawyer.imageURL ?? "/assets/lawyer-demo.jpg"}
-              alt="Foto del abogado"
-              className="items-center justify-center w-32 h-32 rounded-3xl object-cover mb-4"
-            />
-          </div>
+      <>
+        <aside className="mt-11 w-full md:w-[300px] p-7 md:sticky md:top-18 self-start">
+          {lawyer ? (
+              <>
+                <div className="flex flex-col items-center">
+                  <img
+                      src={lawyer.imageURL ?? "/assets/lawyer-demo.jpg"}
+                      alt="Foto del abogado"
+                      className="items-center justify-center w-32 h-32 rounded-3xl object-cover mb-4"
+                  />
+                </div>
 
-          <div className="mb-3">
-            <h3 className="font-semibold text-lg text-[var(--c-text)]/90">
-              Contacto
+                <div className="mt-6 mb-4">
+                  <h3 className="font-semibold text-lg text-[var(--c-text)]/90">
+                    Contacto
+                  </h3>
+                  <div className="mt-1 mb-4 border-1 border-sky-400" />
+                  <div className="flex items-center gap-2 text-[var(--c-text)]/90 mb-1">
+                    <Mail className="w-4 h-4 text-[var(--c-text)]" />
+                    <span>{lawyer.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[var(--c-text)]/90">
+                    <MapPin className="w-4 h-4 text-[var(--c-text)]" />
+                    <span>
+                  {lawyer.province === "LIMA" ? "Lima, Perú" : "Fuera de Lima"}
+                </span>
+                  </div>
+                </div>
+
+                  <div className="mt-8 mb-4">
+                      <h3 className="font-semibold text-lg text-[var(--c-text)]/90">
+                          Perfil profesional
+                      </h3>
+                      <div className="mt-1 mb-4 border-1 border-sky-400" />
+                      <div className="flex items-center gap-2 text-[var(--c-text)]/90 mb-1">
+                          <BriefcaseBusiness className="w-4 h-4 text-[var(--c-text)]" />
+                          <span>{lawyer.yearExperience} años de experiencia</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[var(--c-text)]/90">
+                          <p> S/. </p>
+                          <span>{lawyer.contactPrice} por consulta</span>
+                      </div>
+                  </div>
+              </>
+          ) : (
+              <p className="text-gray-500">{error ?? "Cargando abogado..."}</p>
+          )}
+
+          <div>
+            <h3 className="font-semibold text-lg text-[var(--c-text)]/90 mt-8 mb-1">
+              Resumen de Reseñas
             </h3>
             <div className="mt-1 mb-4 border-1 border-sky-400" />
-            <div className="flex items-center gap-2 text-[var(--c-text)]/90 mb-1">
-              <Mail className="w-4 h-4 text-sky-500" />
-              <span>{lawyer.email}</span>
-            </div>
-            <div className="flex items-center gap-2 text-[var(--c-text)]/90">
-              <MapPin className="w-4 h-4 text-sky-500" />
-              <span>
-                {lawyer.province === "LIMA" ? "Lima, Perú" : "Fuera de Lima"}
+            {summary ? (
+                <div className="flex flex-col items-center justify-center text-[var(--c-text)]/90">
+                  <h1 className="text-4xl font-bold mb-2 mt-2">
+                    {summary.average === 0 ? "0.0" : summary.average.toFixed(1)}
+                  </h1>
+                  <StarRating value={summary.average} />
+                  <span className="text-sm mt-1 text-[var(--c-text)]/70">
+                ({summary.numReviews} reseña{summary.numReviews === 1 ? "" : "s"})
               </span>
-            </div>
+                </div>
+            ) : (
+                <p className="text-gray-500">Cargando...</p>
+            )}
           </div>
-        </>
-      ) : (
-        <p className="text-gray-500">{error ?? "Cargando abogado..."}</p>
-      )}
 
-      <div>
-        <h3 className=" font-semibold text-lg text-[var(--c-text)]/90 mb-1">
-          Resumen de Reseñas
-        </h3>
-        <div className="mt-1 mb-4 border-1 border-sky-400" />
-        {summary ? (
-          <div className="flex flex-col items-center justify-center text-[var(--c-text)]/90">
-            <h1 className="text-4xl font-bold mb-2">
-              {summary.average === 0 ? "0.0" : summary.average.toFixed(1)}
-            </h1>
-            <StarRating value={summary.average} />
-            <span className="text-sm mt-1 text-[var(--c-text)]/70">
-              ({summary.numReviews} reseña{summary.numReviews === 1 ? "" : "s"})
-            </span>
-          </div>
-        ) : (
-          <p className="text-gray-500">Cargando...</p>
+          {canReview && (
+              <div className="flex flex-col items-center justify-center mt-2">
+                  <button
+                      onClick={(e) => {
+                          const btn = e.currentTarget;
+                          btn.classList.add('animate-pop');
+                          setTimeout(() => btn.classList.remove('animate-pop'), 300);
+                          handleWriteReview();
+                      }}
+                      className="cursor-pointer flex items-center justify-center gap-2 mt-4 px-3 py-1 rounded-full border text-[var(--c-text)] border-[var(--c-text)] bg-transparent transition transform hover:scale-[1.04] hover:bg-sky-500 hover:border-sky-500 hover:text-white duration-200 ease-in-out"
+                  >
+                      <Pencil className="w-4 h-4" />
+                      <span className="font-normal text-md">Escribir una reseña</span>
+                  </button>
+              </div>
+          )}
+        </aside>
+
+        {showReviewForm && (
+            <ReviewModal
+                rating={rating}
+                setRating={setRating}
+                reviewText={reviewText}
+                setReviewText={setReviewText}
+                onClose={() => setShowReviewForm(false)}
+                onSubmit={handleSubmitReview}
+            />
         )}
-      </div>
-
-      {canReview && !showReviewForm && (
-        <div className="flex flex-col items-center justify-center">
-          <button
-            onClick={handleWriteReview}
-            className="text-md flex justify-center mt-4 px-4 py-2 bg-sky-500 text-white bold rounded-full  hover:bg-sky-600 transition-all"
-          >
-            Escribir una reseña
-          </button>
-        </div>
-      )}
-
-      {showReviewForm && (
-        <div className=" mt-4 w-full bg-[var(--c-dropdown-bg)] border border-[var(--c-border)]/50 shadow-lg rounded-xl p-4 space-y-3 flex flex-col items-center">
-          <div className="flex justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setRating(star)}
-                className="focus:outline-none"
-              >
-                <Star
-                  size={20}
-                  className={
-                    star <= rating
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-400"
-                  }
-                />
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            className="text-[var(--c-text)]/90  w-full border border-gray-300/70 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none resize-none"
-            rows={4}
-            placeholder="Escribe tu reseña aquí..."
-          />
-
-          <div className="flex justify-center gap-2">
-            <button
-              onClick={() => setShowReviewForm(false)}
-              className="text-[var(--c-text)]/90 bold text-sm px-3 py-1 rounded-full border border-gray-300 hover:bg-[var(--c-bg-hover2)]"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSubmitReview}
-              disabled={rating === 0 || reviewText.trim() === ""}
-              className="bold text-sm px-4 py-2 bg-sky-400 text-white rounded-full hover:bg-sky-500"
-            >
-              Enviar reseña
-            </button>
-          </div>
-        </div>
-      )}
-    </aside>
+      </>
   );
 }
 
 function StarRating({ value }: { value: number }) {
   const rounded = Math.round(value);
   return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          size={18}
-          className={
-            i <= rounded ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }
-        />
-      ))}
-    </div>
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+            <Star
+                key={i}
+                size={18}
+                className={
+                  i <= rounded ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                }
+            />
+        ))}
+      </div>
+  );
+}
+
+function ReviewModal({
+                       rating,
+                       setRating,
+                       reviewText,
+                       setReviewText,
+                       onClose,
+                       onSubmit,
+                     }: {
+  rating: number;
+  setRating: (v: number) => void;
+  reviewText: string;
+  setReviewText: (v: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
+
+  const GradientDefs = () => (
+      <svg width="0" height="0">
+        <defs>
+          <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFD700" />
+            <stop offset="100%" stopColor="#FFA500" />
+          </linearGradient>
+        </defs>
+      </svg>
+  );
+
+  return createPortal(
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+        <GradientDefs />
+
+        <div className="relative w-full max-w-md p-6 bg-white rounded-2xl shadow-xl">
+          <button
+              onClick={onClose}
+              className="cursor-pointer absolute top-3 right-3 text-gray-500 hover:text-red-500"
+          >
+            <X size={20} />
+          </button>
+
+          <h2 className="text-lg font-semibold text-center text-gray-800 mb-4">
+            Escribe tu reseña
+          </h2>
+
+          <div className="flex justify-center gap-2 mb-5">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                    key={star}
+                    onClick={() => setRating(star)}
+                    className="focus:outline-none cursor-pointer"
+                >
+                  <Star
+                      size={24}
+                      className={star <= rating ? "text-transparent" : "text-gray-300"}
+                      style={star <= rating ? { fill: "url(#starGradient)" } : {}}
+                  />
+                </button>
+            ))}
+          </div>
+
+          <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-400"
+              rows={4}
+              placeholder="Comenta tu experiencia"
+          />
+
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+                onClick={onClose}
+                className="cursor-pointer px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
+            >
+              Cancelar
+            </button>
+            <button
+                onClick={onSubmit}
+                disabled={rating === 0 || reviewText.trim() === ""}
+                className="cursor-pointer px-4 py-2 text-sm text-white bg-sky-500 rounded-full hover:bg-sky-600 disabled:opacity-50"
+            >
+              Enviar reseña
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
   );
 }
