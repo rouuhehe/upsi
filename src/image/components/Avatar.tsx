@@ -27,12 +27,12 @@ const iconSizes = {
 };
 
 export function Avatar({
-  size = "md",
-  src,
-  alt,
-  fallback,
-  className = "",
-}: AvatarProps) {
+                         size = "md",
+                         src,
+                         alt,
+                         fallback,
+                         className = "",
+                       }: AvatarProps) {
   const { image } = useProfileImage();
   const [hasError, setHasError] = useState(false);
 
@@ -42,38 +42,38 @@ export function Avatar({
   const shouldShowImage = imageUrl && !hasError;
 
   return (
-    <div
-      className={`${sizeClasses[size]} rounded-full overflow-hidden ${className}`}
-    >
-      {shouldShowImage ? (
-        <img
-          src={imageUrl}
-          alt={altText}
-          loading="lazy"
-          className={`${sizeClasses[size]} object-cover`}
-          onError={() => setHasError(true)}
-        />
-      ) : (
-        <div
-          className={`${sizeClasses[size]} bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center text-white font-semibold`}
-        >
-          {fallback ? (
-            <span
-              className={`${
-                size === "xs"
-                  ? "text-xs"
-                  : size === "sm"
-                    ? "text-sm"
-                    : "text-base"
-              }`}
+      <div
+          className={`${sizeClasses[size]} rounded-full overflow-hidden ${className}`}
+      >
+        {shouldShowImage ? (
+            <img
+                src={imageUrl}
+                alt={altText}
+                loading="lazy"
+                className={`${sizeClasses[size]} object-cover`}
+                onError={() => setHasError(true)}
+            />
+        ) : (
+            <div
+                className={`${sizeClasses[size]} bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center text-white font-semibold`}
             >
+              {fallback ? (
+                  <span
+                      className={`${
+                          size === "xs"
+                              ? "text-xs"
+                              : size === "sm"
+                                  ? "text-sm"
+                                  : "text-base"
+                      }`}
+                  >
               {fallback}
             </span>
-          ) : (
-            <User className={iconSizes[size]} />
-          )}
-        </div>
-      )}
-    </div>
+              ) : (
+                  <User className={iconSizes[size]} />
+              )}
+            </div>
+        )}
+      </div>
   );
 }

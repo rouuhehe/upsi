@@ -6,6 +6,7 @@ import type { LawyerResponse } from "../schemas/LawyerResponseSchema";
 import { LawyerRatingSummarySchema } from "../schemas/LawyerRatingSummarySchema";
 import { hasCooldown } from "../../utils/contactCooldown";
 import { apiClient, wrap } from "../../utils/api";
+import { useCurrentUser } from "../../user/hooks/useCurrentUser";
 
 type LawyerRatingSummary = z.infer<typeof LawyerRatingSummarySchema>;
 
@@ -20,13 +21,16 @@ export function LawyerSidebar({
   error?: string | null;
   reloadReviews: () => void;
 }) {
-  const canReview = lawyer?.id ? !hasCooldown(lawyer.id) : false;
 
-  const [showReviewForm, setShowReviewForm] = useState(false);
+    const { user } = useCurrentUser();
+    const canReview =
+        lawyer?.id && user?.email !== lawyer.email && !hasCooldown(lawyer.id);
+
+    const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
 
-  const handleWriteReview = () => {
+    const handleWriteReview = () => {
     setShowReviewForm(true);
   };
 
@@ -53,7 +57,7 @@ export function LawyerSidebar({
     }
   };
 
-  return (
+   return (
       <>
         <aside className="mt-11 w-full md:w-[300px] p-7 md:sticky md:top-18 self-start">
           {lawyer ? (

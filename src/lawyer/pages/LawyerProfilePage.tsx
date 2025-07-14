@@ -31,8 +31,6 @@ export default function LawyerProfilePage() {
   const [localDescription, setLocalDescription] = useState(
     lawyer?.description ?? "Este usuario no tiene descripción",
   );
-  const descriptionLines = localDescription.split("\n");
-  const visibleLines = showFullDescription ? descriptionLines : descriptionLines.slice(0, 8);
 
   useEffect(() => {
     if (lawyer?.description !== undefined && lawyer?.description !== null) {
@@ -45,8 +43,6 @@ export default function LawyerProfilePage() {
       reloadSummary();
     }
   }, [lawyerId, reloadSummary]);
-
-  if (!lawyerId) return <p>Abogado no encontrado.</p>;
 
   const [showForm, setShowForm] = useState(false);
   const [subject, setSubject] = useState("");
@@ -105,6 +101,7 @@ export default function LawyerProfilePage() {
   const isTooLong = localDescription.length > maxChars;
   const shortDescription = localDescription.slice(0, maxChars);
 
+  if (!lawyerId) return <p>Abogado no encontrado.</p>;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen text-[var(--c-text)]">
@@ -144,21 +141,23 @@ export default function LawyerProfilePage() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-end">
-            <div className="bg-gradient-to-r from-sky-400 to-blue-500 p-[1px] rounded-xl">
-              <button
-                  onClick={handleToggleForm}
-                  className="cursor-pointer bg-[var(--c-bg)] text-sky-500 font-semibold py-2 px-4 rounded-xl text-sm transition-all duration-200 hover:bg-gradient-to-r from-sky-400 to-blue-500 hover:text-white"
-              >
-                Contactar Ahora
-              </button>
-            </div>
-            {isBlocked && (
-                <span className="text-xs text-[var(--c-text)]/70 bold mt-1">
-                  Espera antes de volver a contactar
-                </span>
-            )}
-          </div>
+          {lawyer?.email !== user?.email && (
+              <div className="flex flex-col items-end">
+                <div className="bg-gradient-to-r from-sky-400 to-blue-500 p-[1px] rounded-xl">
+                  <button
+                      onClick={handleToggleForm}
+                      className="cursor-pointer bg-[var(--c-bg)] text-sky-500 font-semibold py-2 px-4 rounded-xl text-sm transition-all duration-200 hover:bg-gradient-to-r from-sky-400 to-blue-500 hover:text-white"
+                  >
+                    Contactar Ahora
+                  </button>
+                </div>
+                {isBlocked && (
+                    <span className="text-xs text-[var(--c-text)]/70 bold mt-1">
+                      Espera antes de volver a contactar
+                    </span>
+                )}
+              </div>
+          )}
         </div>
 
         {showForm && (
@@ -247,13 +246,13 @@ export default function LawyerProfilePage() {
                         setEditingDescription(false);
                       }
                     }}
-                    className="bg-sky-400 text-white px-6 py-2 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                    className="cursor-pointer bg-sky-400 text-white px-6 py-2 rounded-lg hover:bg-sky-500 transition-all duration-200 font-medium"
                   >
                     ✓ Guardar cambios
                   </button>
                   <button
                     onClick={() => setEditingDescription(false)}
-                    className="px-6 py-2 text-[var(--c-text)]/70 hover:text-[var(--c-text)]/70 hover:bg-[var(--c-bg-hover2)] rounded-lg transition-all duration-200 font-medium"
+                    className="cursor-pointer px-6 py-2 text-[var(--c-text)]/70 hover:text-[var(--c-text)]/70 hover:bg-[var(--c-bg-hover2)] rounded-lg transition-all duration-200 font-medium"
                   >
                     Cancelar
                   </button>
@@ -279,7 +278,7 @@ export default function LawyerProfilePage() {
                   user?.roles.includes("ADMIN")) && (
                   <button
                     onClick={() => setEditingDescription(true)}
-                    className="inline-flex items-center gap-2 text-sky-400 hover:text-sky-500 hover:bg-[var(--c-bg-hover2)] px-3 py-2 rounded-lg transition-all duration-200 font-medium"
+                    className="cursor-pointer ml-4 inline-flex items-center gap-2 text-sky-400 hover:text-sky-500 hover:bg-[var(--c-bg-hover2)] px-3 py-2 rounded-lg transition-all duration-200 font-medium"
                   >
                     <svg
                       className="w-4 h-4"

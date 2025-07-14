@@ -3,8 +3,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient, wrap } from "../../utils/api";
 import { LawyerSpecializationLabels } from "../schemas/lawyerLabels";
+import { BriefcaseBusiness, Star } from "lucide-react";
 
-export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
+export function LawyerCard({
+                             lawyer,
+                             currentUserEmail,
+                           }: {
+  lawyer: LawyerResponse;
+  currentUserEmail?: string;
+}) {
+
   const [showForm, setShowForm] = useState(false);
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
@@ -68,10 +76,10 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
     <div className="space-y-4">
       <div
         onClick={goToProfile}
-        className="cursor-pointer bg-[var(--c-bg-soft)] rounded-2xl p-6 border  border-[var(--c-border)]/50  hover:shadow-md transition-all duration-300 group-hover:bg-[var(--c-bg)] ... flex items-center justify-between group"
+        className="cursor-pointer bg-[var(--c-bg)] rounded-2xl p-4 hover:shadow-md transition-all duration-300 group-hover:bg-[var(--c-bg)] ... flex items-center justify-between group"
       >
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center">
+          <div className="w-28 h-28 rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center">
             {lawyer.imageURL ? (
               <img
                 src={lawyer.imageURL}
@@ -81,46 +89,78 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
             ) : (
               <span className="text-white font-bold text-xl">
                 {lawyer.firstName[0]}
-
                 {lawyer.lastName[0]}
               </span>
             )}
           </div>
 
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-[var(--c-text)]/90 group-hover:text-sky-400 transition-colors">
+            <h2 className="text-2xl font-bold text-[var(--c-text)] group-hover:text-sky-400 transition-colors mb-1">
               {lawyer.firstName} {lawyer.lastName}
             </h2>
-            <p className="text-sm text-sky-400 font-medium">
-              {lawyer.specializations
-                .map(
-                  (spec) =>
-                    LawyerSpecializationLabels[
-                      spec as keyof typeof LawyerSpecializationLabels
-                    ],
-                )
-                .join(", ")}
+            <p className="text-large text-[var(--c-text)] font-medium">
+              Especialista en Derecho{" "}
+              {
+                lawyer.specializations.length === 1
+                    ? LawyerSpecializationLabels[lawyer.specializations[0] as keyof typeof LawyerSpecializationLabels]
+                    : lawyer.specializations
+                        .map(
+                            (spec) =>
+                                LawyerSpecializationLabels[spec as keyof typeof LawyerSpecializationLabels]
+                        )
+                        .join(", ")
+                        .replace(/, ([^,]*)$/, " y $1")
+              }
             </p>
-            <p className="text-sm font-semibold text-[var(--c-text)]/90 mt-1">
-              PEN S/.{lawyer.contactPrice} por consulta
-            </p>
+            <div className="flex items-center justify-start gap-2 mt-1">
+              <p className="text-sm font-normal text-[var(--c-text)]/90">S/.</p>
+              <p className="text-sm font-normal text-[var(--c-text)]/90">
+                {lawyer.contactPrice} por consulta
+              </p>
+            </div>
+            <div className="flex items-center justify-start gap-2 mt-1">
+              <BriefcaseBusiness className="w-4 h-4 text-black" />
+              <p className="text-sm font-normal text-[var(--c-text)]/90">
+                {lawyer.yearExperience} años de experiencia
+              </p>
+            </div>
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-1">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleForm();
-            }}
-            className="hover:border-sky-500 mb-1 hover:bg-sky-200/10 border-2 border-sky-400 text-sky-400 font-semibold py-2 px-4 rounded-xl transition-all duration-200 text-sm"
-          >
-            Contactar Ahora
-          </button>
+          <div className="flex flex-col mb-4">
+            <div className="flex items-center justify-between gap-2 text-2xl font-semibold text-[var(--c-text)]">
+              {lawyer.avgRating}
+              <Star className="w-5 h-5 text-yellow-500 fill-current" />
+            </div>
+            <p className="text-large font-light">Reseñas</p>
+          </div>
+
+          {lawyer.email !== currentUserEmail && (
+              <div className="p-[1.5px] rounded-xl bg-gradient-to-r from-sky-400 to-blue-500">
+                <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleForm();
+                    }}
+                    className="cursor-pointer bg-[var(--c-bg)] text-sky-500 font-semibold py-2 px-4 rounded-xl text-sm transition-all duration-200 hover:bg-gradient-to-r from-sky-400 to-blue-500 hover:text-white"
+                >
+                  Contactar Ahora
+                </button>
+              </div>
+          )}
+
+          {lawyer.email === currentUserEmail && (
+              <span className="text-xs text-[var(--c-text)]/60 font-semibold mt-1">
+    Este es tu perfil
+  </span>
+          )}
+
+
           {isBlocked && (
-            <span className="text-xs text-[var(--c-text)]/70 bold">
-              Espera antes de volver a contactar
-            </span>
+              <span className="text-xs text-[var(--c-text)]/70 font-semibold mt-1">
+                Espera antes de volver a contactar
+              </span>
           )}
         </div>
       </div>
@@ -206,7 +246,7 @@ export function LawyerCard({ lawyer }: { lawyer: LawyerResponse }) {
                   <button
                     type="submit"
                     disabled={isSending}
-                    className="border-lime-400 border-3 hover:border-lime-600 hover:text-lime-600 text-lime-500 text-md font-semibold py-3 px-5 rounded-full transition-all duration-200 flex items-center gap-2"
+                    className="cursor-pointer border-lime-400 border-2 hover:border-lime-600 hover:text-lime-600 text-lime-500 text-md font-semibold py-2 px-4 rounded-full transition-all duration-200 flex items-center gap-2"
                   >
                     Enviar correo
                     <svg

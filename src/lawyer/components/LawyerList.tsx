@@ -96,12 +96,12 @@ export default function LawyerListPage() {
 
       <button
         onClick={() => setSidebarOpen(true)}
-        className="font-semibold fixed bottom-6 right-6 z-50 p-4 py-2 mb-3 bg-sky-500 text-white rounded-full shadow-lg hover:bg-sky-600 transition md:hidden"
+        className="font-semibold fixed bottom-6 right-6 z-50 p-2 py-2 mb-3 bg-sky-500 text-white rounded-full shadow-lg hover:bg-sky-600 transition md:hidden"
       >
         Filtros
       </button>
 
-      <main className="flex-1 p-8 md:ml-72">
+      <main className="flex-1 mt-8 md:ml-72">
         {showCta && (
           <div className="mb-8">
             <AlertSection />
@@ -111,17 +111,20 @@ export default function LawyerListPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[var(--c-text)] mb-2">
-                Encuentra tu Abogado Ideal
+              <h1 className="text-5xl font-bold text-[var(--c-text)] mb-2">
+                Encuentra tu abogado ideal
               </h1>
-              <p className="text-[var(--c-text)]/70">
-                {filteredLawyers.length} abogados disponibles
-                {totalPages > 1 && (
-                  <span className="ml-2 text-sm">
-                    (Página {currentPage} de {totalPages})
-                  </span>
-                )}
-              </p>
+                <p className="text-2xl text-[var(--c-text)] font-light font-sans">
+                    Contacta con abogados al rededor del Perú y obtén asesoría legal de primer nivel
+                </p>
+                <p className="text-[var(--c-text)]/70 mt-2">
+                    {filteredLawyers.length} {filteredLawyers.length === 1 ? 'abogado disponible' : 'abogados disponibles'}
+                    {totalPages > 1 && (
+                        <span className="ml-2 text-sm">
+                            (Página {currentPage} de {totalPages})
+                        </span>
+                    )}
+                </p>
             </div>
           </div>
         </div>
@@ -217,7 +220,7 @@ export default function LawyerListPage() {
                       key={lawyer.email}
                       className="transform transition-all duration-300 hover:scale-[1.02]"
                     >
-                      <LawyerCard lawyer={lawyer} />
+                        <LawyerCard lawyer={lawyer} currentUserEmail={me?.email} />
                     </div>
                   ))}
                 </div>

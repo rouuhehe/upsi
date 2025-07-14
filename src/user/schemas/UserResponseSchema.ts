@@ -12,4 +12,5 @@ export const UserResponseSchema = z.object({
   }, "El número de teléfono solo debe contener dígitos"),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  imageURL: z.string().nullable().optional(),
 });

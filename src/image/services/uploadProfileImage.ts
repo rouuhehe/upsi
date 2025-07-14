@@ -3,7 +3,7 @@ import { apiClient, wrap } from "../../utils/api";
 import type { ImageResponse } from "../types/ImageResponse";
 
 export function uploadProfileImage(
-  file: File,
+    file: File,
 ): ResultAsync<ImageResponse, Error> {
   const formData = new FormData();
   formData.append("file", file);
