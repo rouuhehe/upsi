@@ -83,7 +83,7 @@ export const GuideList = ({
               </h1>
               <p className="text-[var(--c-text)]/70 mb-6">
                 Explora nuestra biblioteca de guías legales y encuentra
-                soluciones para tus dudas legales.
+                soluciones para todas tus consultas.
               </p>
             </div>
             {(filterType || filterAge || searchTerm) && (

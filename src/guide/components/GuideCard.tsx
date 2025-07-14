@@ -8,25 +8,17 @@ interface GuideCardProps {
   id: string;
   title: string;
   type: GuideType;
-  createdAt: string;
   authorId: string;
-  content: string;
+  createdAt: string;
 }
 
-const GuideCard = ({
-  id,
-  title,
-  type,
-  createdAt,
-  authorId,
-}: GuideCardProps) => {
+
+const GuideCard = ({ id, title, type, createdAt }: GuideCardProps) => {
   const navigate = useNavigate();
   const { user } = useCurrentUser();
 
   const canEdit =
-    user &&
-    (user.roles.includes("ADMIN") ||
-      (user.roles.includes("LAWYER") && authorId === user.id));
+    user && (user.roles.includes("ADMIN") || user.roles.includes("LAWYER"));
 
   const formattedDate = useMemo(() => {
     return new Date(createdAt).toLocaleDateString("es-ES", {
@@ -67,7 +59,7 @@ const GuideCard = ({
               e.stopPropagation();
               navigate(`/guides/edit/${id}`);
             }}
-            className="group/btn inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-xl bg-sky-400 hover:bg-sky-500 text-white transition-all duration-300 transform hover:scale-105 active:scale-95 shadow hover:shadow-md"
+            className="group/btn inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-xl bg-neutral-500 hover:bg-neutral-600 text-white transition-all duration-300 transform hover:scale-105 active:scale-95 shadow hover:shadow-md"
           >
             <svg
               className="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-300"
@@ -85,7 +77,9 @@ const GuideCard = ({
             <span>Editar</span>
           </button>
         ) : (
-          <span className="text-sm text-sky-500 font-medium ">Leer más →</span>
+          <span className="text-sm text-sky-500 font-medium ">
+            Leer más →
+          </span>
         )}
       </div>
     </div>

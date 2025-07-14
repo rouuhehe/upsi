@@ -82,7 +82,7 @@ export default function GuideEditor({
       },
       attributes: {
         class: internalValue ? "" : "is-empty",
-        "data-placeholder": placeholder || "Escribe aquí…",
+        "data-placeholder": placeholder || "Empieza a escribir tu guía aquí…",
       },
     },
   });

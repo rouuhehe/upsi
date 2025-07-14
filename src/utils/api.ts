@@ -305,6 +305,17 @@ const contract = c.router(
         ...defaultErrors,
       },
     },
+    validateGuideContent: {
+      method: "POST",
+      path: "/api/ai/guide/validate",
+      body: z.object({
+        prompt: z.string().min(10),
+      }),
+      responses: {
+        200: z.string(),
+        ...defaultErrors,
+      },
+    }
   },
   { strictStatusCodes: true },
 );
