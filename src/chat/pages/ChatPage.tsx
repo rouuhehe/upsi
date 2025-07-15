@@ -6,7 +6,7 @@ import type { SessionResponse } from "../types/SessionResponse";
 import ConfirmModal from "../../common/components/ConfirmModal";
 import { apiClient, wrap } from "../../utils/api";
 import { useUserSessions } from "../hooks/useUserSessions";
-import { PanelRight, PanelRightClose } from "lucide-react";
+import { PanelRightClose } from "lucide-react";
 
 export default function ChatPage() {
   const [sessionToDelete, setSessionToDelete] =
