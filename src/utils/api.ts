@@ -315,7 +315,43 @@ const contract = c.router(
         200: z.string(),
         ...defaultErrors,
       },
-    }
+    },
+    uploadOcrImage: {
+    method: "POST",
+    path: "/api/ocr/image",
+    body: z.unknown(),
+    contentType: "multipart/form-data",
+    responses: {
+      200: z.string(),
+      ...defaultErrors,
+    },
+  },
+  uploadOcrPdf: {
+    method: "POST",
+    path: "/api/ocr/pdf",
+    body: z.unknown(),
+    contentType: "multipart/form-data",
+    responses: {
+      200: z.string(),
+      ...defaultErrors,
+    },
+  },
+  uploadAudio: {
+  method: "POST",
+  path: "/api/speech/transcribe",
+  body: z.unknown(),
+  contentType: "multipart/form-data",
+  responses: {
+    200: z.object({ text: z.string() }),
+    400: z.object({
+      message: z.string(),
+      status: z.number(),
+      timestamp: z.string(),
+    }),
+  },
+}
+
+
   },
   { strictStatusCodes: true },
 );
@@ -340,7 +376,7 @@ export const apiClient = initClient(contract, {
 });
 
 export function wrap<T>(
-  promise: Promise<{ status: number; body: T | APIError }>,
+  promise: Promise<{ status: number; body: T | APIError; headers?: Headers }>,
   mapErr?: (err: APIError, status: number) => string,
 ): ResultAsync<T, Error> {
   return ResultAsync.fromPromise(promise, (err) => {
@@ -350,9 +386,10 @@ export function wrap<T>(
     if (res.status >= 200 && res.status < 400) {
       return ok(res.body as T);
     }
+
     const apiError = res.body as APIError;
     const mapped = mapErr?.(apiError, res.status) ?? apiError.message;
-
     return err(new Error(mapped || "Error desconocido"));
   });
 }
+

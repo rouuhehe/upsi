@@ -7,6 +7,7 @@ import type { GuideType } from "../schemas/GuideTypeSchema";
 import { useCreateGuide } from "../hooks/useCreateGuide";
 import { validateGuideContent } from "../services/validateGuideContent";
 import ReactMarkdown from "react-markdown";
+import { UploadModal } from "../../common/components/UploadModal";
 
 export default function CreateGuidePage() {
   const [title, setTitle] = useState("");
@@ -49,6 +50,7 @@ export default function CreateGuidePage() {
 
   return (
     <>
+      
       <form onSubmit={handleSubmit} className="max-w-5xl mx-auto space-y-8 px-4 py-20">
         <div className="flex items-center gap-6 mb-12">
           <div className="w-20 h-20 flex items-center justify-center bg-sky-400 rounded-3xl shadow-md">
@@ -77,9 +79,24 @@ export default function CreateGuidePage() {
           </div>
         </div>
 
+  
+
         <GuideTitleInput value={title} onChange={setTitle} error={errors.title} />
-        <GuideEditor value={content} onChange={setContent} />
         <GuideTypeSelector value={type} onChange={setType} />
+
+        <div className="flex flex-col items-center gap-6">
+          <UploadModal onExtracted={(text) => setContent(text)} />
+
+          <div className="w-full relative my-4">
+            <hr className="border-t border-gray-300" />
+            <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[var(--c-bg)] px-4 text-gray-500 text-sm">
+              o, empieza a escribirla
+            </span>
+          </div>
+        </div>
+
+        <GuideEditor value={content} onChange={setContent} />
+
 
         {validationFeedback && (
           <div
@@ -100,11 +117,12 @@ export default function CreateGuidePage() {
           </div>
         )}
 
+        
 
         <GuideSubmitButton
           isSubmitting={isSubmitting || isValidating}
           onClick={isValidated ? handleSubmit : handleValidation}
-          label={isValidated ? "Publicar guía" : "Validar contenido con IA"}
+          label={isValidated ? "Publicar guía" : "Validar contenido"}
         />
       </form>
     </>

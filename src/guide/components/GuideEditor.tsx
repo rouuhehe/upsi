@@ -40,6 +40,7 @@ export default function GuideEditor({
   const [wordCount, setWordCount] = useState(0);
   const [internalValue, setInternalValue] = useState(value);
   const [lastMode, setLastMode] = useState<"visual" | "vim">(mode);
+  const [ignoreNextChange, setIgnoreNextChange] = useState(false);
 
   useEffect(() => {
     setInternalValue(value);
@@ -67,6 +68,7 @@ export default function GuideEditor({
       if (mode === "visual") {
         const html = editor.getHTML();
         const md = htmlToMarkdown(html);
+        setIgnoreNextChange(true); 
         setInternalValue(md);
         onChange(md);
       }
@@ -88,19 +90,25 @@ export default function GuideEditor({
   });
 
   useEffect(() => {
-    if (editor && mode === "visual") {
-      editor.commands.setContent(markdownToHtml(value));
-    }
-  }, [value, editor, mode]);
+  if (!editor || mode !== "visual") return;
 
-  const toggleBold = () => editor?.chain().focus().toggleBold().run();
-  const toggleItalic = () => editor?.chain().focus().toggleItalic().run();
-  const toggleUnderline = () => editor?.chain().focus().toggleUnderline().run();
-  const toggleBullet = () => editor?.chain().focus().toggleBulletList().run();
-  const toggleOrdered = () => editor?.chain().focus().toggleOrderedList().run();
-  const toggleQuote = () => editor?.chain().focus().toggleBlockquote().run();
-  const setColor = (color: string) =>
-    editor?.chain().focus().setColor(color).run();
+  const currentMarkdown = htmlToMarkdown(editor.getHTML());
+
+  const isExternalUpdate = value !== currentMarkdown && !editor.isFocused;
+
+  if (isExternalUpdate) {
+    editor.commands.setContent(markdownToHtml(value));
+  }
+}, [value, editor, mode]);
+
+
+  const toggleBold = () => editor?.chain().toggleBold().run();
+  const toggleItalic = () => editor?.chain().toggleItalic().run();
+  const toggleUnderline = () => editor?.chain().toggleUnderline().run();
+  const toggleBullet = () => editor?.chain().toggleBulletList().run();
+  const toggleOrdered = () => editor?.chain().toggleOrderedList().run();
+  const toggleQuote = () => editor?.chain().toggleBlockquote().run();
+  const setColor = (color: string) => editor?.chain().setColor(color).run();
 
   const isBoldActive = !!editor?.isActive("bold");
   const isItalicActive = !!editor?.isActive("italic");
@@ -129,27 +137,9 @@ export default function GuideEditor({
       .replace(/<\/?[^>]+(>|$)/g, "")
       .replace(/\s+/g, " ")
       .trim();
-
     const words = text === "" ? 0 : text.split(" ").length;
     setWordCount(words);
   }, [internalValue]);
-
-  const toggleMarkdown = (type: "bold" | "italic" | "underline") => {
-    if (mode === "visual") {
-      if (type === "bold") toggleBold();
-      if (type === "italic") toggleItalic();
-      if (type === "underline") toggleUnderline();
-    } else {
-      const selected = window.getSelection()?.toString() || "";
-      let wrapped = selected;
-      if (type === "bold") wrapped = `**${selected}**`;
-      if (type === "italic") wrapped = `*${selected}*`;
-      if (type === "underline") wrapped = `<u>${selected}</u>`; // Markdown no tiene subrayado
-      const newValue = internalValue + wrapped;
-      setInternalValue(newValue);
-      onChange(newValue);
-    }
-  };
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-[var(--c-bg)] rounded-xl shadow-lg border border-[var(--c-border)] overflow-hidden">
@@ -183,7 +173,9 @@ export default function GuideEditor({
           </div>
 
           <div className="text-sm text-[var(--c-text)]/50 bg-[var(--c-dropdown-bg)] px-3 py-1.5 rounded-full border border-[var(--c-border)]/70">
-            <span className="font-medium text-[var(--c-text)]/70">{wordCount}</span>{" "}
+            <span className="font-medium text-[var(--c-text)]/70">
+              {wordCount}
+            </span>{" "}
             palabras
           </div>
         </div>
@@ -194,7 +186,7 @@ export default function GuideEditor({
           <div className="flex items-center bg-[var(--c-dropdown-bg)]  rounded-lg border border-[var(--c-border)] shadow-sm p-1">
             <button
               type="button"
-              onClick={() => toggleMarkdown("bold")}
+              onClick={toggleBold}
               title="Negrita (Ctrl+B)"
               className={`p-2 rounded-md transition-all duration-200 hover:scale-105 ${
                 isBoldActive
@@ -206,7 +198,7 @@ export default function GuideEditor({
             </button>
             <button
               type="button"
-              onClick={() => toggleMarkdown("italic")}
+              onClick={toggleItalic}
               title="Cursiva (Ctrl+I)"
               className={`p-2 rounded-md transition-all duration-200 hover:scale-105 ${
                 isItalicActive
@@ -218,7 +210,7 @@ export default function GuideEditor({
             </button>
             <button
               type="button"
-              onClick={() => toggleMarkdown("underline")}
+              onClick={toggleUnderline}
               title="Subrayado (Ctrl+U)"
               className={`p-2 rounded-md transition-all duration-200 hover:scale-105 ${
                 isUnderlineActive

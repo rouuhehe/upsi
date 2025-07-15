@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { GuideTitleInput } from "../components/GuideTitleInput";
 import { GuideTypeSelector } from "../components/GuideTypeSelector";
 import { GuideSubmitButton } from "../components/GuideSubmitButton";
@@ -7,28 +7,67 @@ import GuideEditor from "../components/GuideEditor";
 import { useGuideById } from "../hooks/useGuideById";
 import { useUpdateGuide } from "../hooks/useUpdateGuide";
 import type { GuideType } from "../schemas/GuideTypeSchema";
+import { validateGuideContent } from "../services/validateGuideContent";
+import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 export default function EditGuidePage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: guide, isLoading } = useGuideById(id);
   const { update, isSubmitting, errors } = useUpdateGuide();
-
   const [title, setTitle] = useState("");
   const [type, setType] = useState<GuideType>("CRIMINAL");
   const [content, setContent] = useState("");
+
+  const [isValidating, setIsValidating] = useState(false);
+  const [isValidated, setIsValidated] = useState(false);
+  const [validationFeedback, setValidationFeedback] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (guide) {
       setTitle(guide.title);
       setType(guide.type);
       setContent(guide.content);
+      setIsValidated(false);
+      setValidationFeedback(null);
     }
   }, [guide]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleValidation = async () => {
+    setIsValidating(true);
+    setValidationFeedback(null);
+    setIsValidated(false);
+
+    const result = await validateGuideContent(content);
+    setIsValidating(false);
+
+    if (result.isErr()) {
+      setValidationFeedback(
+        "No se pudo validar el contenido. Intenta nuevamente."
+      );
+      return;
+    }
+
+    const feedback = result.value;
+    setValidationFeedback(feedback);
+    const isValid = feedback.trim().toLowerCase() === "contenido válido";
+    setIsValidated(isValid);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id) return;
-    update({ id, title, type, content });
+    if (!id || !isValidated) return;
+
+    try {
+      await update({ id, title, type, content });
+      toast.success("Guía actualizada");
+      navigate(`/guides/${id}`);
+    } catch {
+      toast.error("No se pudo actualizar la guía");
+    }
   };
 
   if (isLoading) {
@@ -81,9 +120,34 @@ export default function EditGuidePage() {
       </div>
 
       <GuideTitleInput value={title} onChange={setTitle} error={errors.title} />
-      <GuideEditor value={content} onChange={setContent} />
       <GuideTypeSelector value={type} onChange={setType} />
-      <GuideSubmitButton isSubmitting={isSubmitting} />
+
+      {validationFeedback && (
+        <div
+          className={`rounded-lg p-4 text-sm mt-4 border ${
+            isValidated
+              ? "bg-green-500/10 text-green-700 border-green-200"
+              : "bg-red-500/10 text-red-700 border-red-200"
+          }`}
+        >
+          <p className="font-semibold mb-2">
+            {isValidated ? "Contenido válido" : "Contenido requiere mejoras"}
+          </p>
+          <div className="prose prose-sm max-w-none">
+            <ReactMarkdown>{validationFeedback}</ReactMarkdown>
+          </div>
+        </div>
+      )}
+
+      <GuideEditor value={content} onChange={setContent} />
+
+      <div className="flex justify-center">
+        <GuideSubmitButton
+          isSubmitting={isSubmitting || isValidating}
+          onClick={isValidated ? undefined : handleValidation}
+          label={isValidated ? "Guardar cambios" : "Validar contenido"}
+        />
+      </div>
     </form>
   );
 }

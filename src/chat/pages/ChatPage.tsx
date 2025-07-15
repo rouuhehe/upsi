@@ -6,6 +6,7 @@ import type { SessionResponse } from "../types/SessionResponse";
 import ConfirmModal from "../../common/components/ConfirmModal";
 import { apiClient, wrap } from "../../utils/api";
 import { useUserSessions } from "../hooks/useUserSessions";
+import { PanelRight, PanelRightClose } from "lucide-react";
 
 export default function ChatPage() {
   const [sessionToDelete, setSessionToDelete] =
@@ -43,15 +44,17 @@ export default function ChatPage() {
         </div>
       </div>
 
+
       <button
         onClick={() => setSidebarOpen(!isSidebarOpen)}
         className={`
-          fixed z-50 w-12 h-12 flex items-center justify-center text-2xl text-white rounded-full shadow-lg transition md:hidden
-          ${isSidebarOpen ? "top-20 left-69 bg-sky-500 hover:bg-sky-600" : "bottom-32 right-6 bg-sky-500 hover:bg-sky-600"}
+          fixed z-50 w-10 h-10 flex items-center justify-center text-2xl text-white rounded-full shadow-lg transition md:hidden
+          ${isSidebarOpen ? "top-20 left-69 bg-sky-500 hover:bg-sky-600" : "top-20 left-3 bg-sky-500 hover:bg-sky-600"}
         `}
       >
-        {isSidebarOpen ? "×" : "+"}
+        <PanelRightClose className="w-6 h-6" />
       </button>
+
 
       <div className="flex-1">
         <MessageArea

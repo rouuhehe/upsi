@@ -1,50 +1,55 @@
-// src/hooks/useUpdateGuide.ts
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { apiClient } from "../../utils/api";
+import { useMutation } from "@tanstack/react-query";
+import { apiClient, wrap } from "../../utils/api";
 import type { GuideType } from "../schemas/GuideTypeSchema";
 
-interface UpdateGuideData {
+type UpdateGuideInput = {
   id: string;
   title: string;
   type: GuideType;
   content: string;
-}
+};
 
-interface ValidationErrorResponse {
-  errors: {
-    title?: string;
-  };
-}
+type UpdateGuideResponse = {
+  id: string;
+  title: string;
+  type: GuideType;
+  content: string;
+  createdAt: string;
+  authorId: string;
+};
+
+type GuideFormErrors = {
+  title?: string;
+  type?: string;
+  content?: string;
+};
+
 
 export function useUpdateGuide() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [errors, setErrors] = useState<{ title?: string }>({});
+  const mutation = useMutation({
+    mutationFn: async ({ id, title, type, content }: UpdateGuideInput) => {
+  const result = await wrap<UpdateGuideResponse>(
+    apiClient.updateGuide({
+      params: { id },
+      body: { title, type, content }, 
+    })
+  );
 
-  const { mutate: update, isPending: isSubmitting } = useMutation({
-    mutationFn: (data: UpdateGuideData) =>
-      apiClient.updateGuide({
-        body: {
-          title: data.title,
-          type: data.type,
-          content: data.content,
-        },
-        params: { id: data.id },
-      }),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["guide", id] });
-      navigate(`/guides/${id}`);
-    },
-    onError: (error: ValidationErrorResponse) => {
-      if (error.errors) {
-        setErrors(error.errors);
-      } else {
-        console.error("Error al actualizar guía", error);
-      }
-    },
+  if (result.isErr()) {
+    throw result.error;
+  }
+
+  return result.value;
+}
+
   });
 
-  return { update, isSubmitting, errors };
+  const formErrors: GuideFormErrors = {};
+
+  return {
+    update: mutation.mutateAsync,
+    isSubmitting: mutation.isPending,
+    error: mutation.error,
+    errors: formErrors,
+  };
 }
